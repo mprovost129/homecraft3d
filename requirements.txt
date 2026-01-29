@@ -9,3 +9,4 @@ boto3
 psycopg2
 Pillow
 gunicorn
+django-otp
