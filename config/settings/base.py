@@ -130,11 +130,11 @@ else:
 
     # Local development Postgres via .env variables (your original local DB config)
     # Requires these in .env: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
-    db_name = env("DB_NAME", default=None)
-    db_user = env("DB_USER", default=None)
-    db_password = env("DB_PASSWORD", default=None)
-    db_host = env("DB_HOST", default=None)
-    db_port = env("DB_PORT", default=None)
+    db_name = env("DB_NAME")
+    db_user = env("DB_USER")
+    db_password = env("DB_PASSWORD")
+    db_host = env("DB_HOST")
+    db_port = env("DB_PORT")
 
     if all([db_name, db_user, db_password, db_host, db_port]):
         DATABASES = {
