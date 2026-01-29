@@ -1,186 +1,250 @@
-import environ
-from pathlib import Path
+# config/settings/base.py
+
 import os
+from pathlib import Path
+
+import environ
 import dj_database_url
 
-BASE_DIR = 'C:\\Users\\mprov\\Dropbox\\Projects\\home_craft_3d\\3dprint_marketplace'
+# ------------------------------------------------------------
+# Paths
+# ------------------------------------------------------------
+# NOTE: your original BASE_DIR was a string; use a real Path.
+# This matches your project layout where base.py is in config/settings/.
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-
-# Initialise environment variables
+# ------------------------------------------------------------
+# Environment
+# ------------------------------------------------------------
 env = environ.Env(
-    DJANGO_DEBUG=(bool, True)
+    DJANGO_DEBUG=(bool, True),
 )
-env_path = Path(BASE_DIR) / '.env'
+
+# Read .env from project root (BASE_DIR/.env)
+env_path = BASE_DIR / ".env"
 print(f"[DEBUG] Reading .env from: {env_path}")
-environ.Env.read_env(env_path)
+if env_path.exists():
+    environ.Env.read_env(env_path)
 
-SECRET_KEY = env('DJANGO_SECRET_KEY')
-DEBUG = env('DJANGO_DEBUG')
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
-if 'homecraft3d.onrender.com' not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append('homecraft3d.onrender.com')
+# ------------------------------------------------------------
+# Core settings
+# ------------------------------------------------------------
+SECRET_KEY = env("DJANGO_SECRET_KEY")
+DEBUG = env("DJANGO_DEBUG")
 
+# Render sets RENDER=true automatically on the service runtime
+IS_RENDER = os.environ.get("RENDER") == "true"
+
+# Allowed hosts
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",") if h.strip()]
+if "homecraft3d.onrender.com" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("homecraft3d.onrender.com")
+
+# ------------------------------------------------------------
+# Apps
+# ------------------------------------------------------------
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
     # 2FA and OTP
-    'django_otp',
-    'django_otp.plugins.otp_totp',
-    'two_factor',
+    "django_otp",
+    "django_otp.plugins.otp_totp",
+    "two_factor",
     # Project apps
-    'accounts',
-    'storefront',
-    'products',
-    'orders',
-    'sellers',
-    'payments',
-    'moderation',
-    'reviews',
-    'legal',
-    'messaging',
-    'django_recaptcha',
+    "accounts",
+    "storefront",
+    "products",
+    "orders",
+    "sellers",
+    "payments",
+    "moderation",
+    "reviews",
+    "legal",
+    "messaging",
+    "django_recaptcha",
 ]
 
-# Custom user model
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = "accounts.User"
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [Path(BASE_DIR) / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'config.store_context.store_name',
-                'storefront.context_processors.cart_item_count',
-                'storefront.context_processors.theme_mode',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "config.store_context.store_name",
+                "storefront.context_processors.cart_item_count",
+                "storefront.context_processors.theme_mode",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
+# ------------------------------------------------------------
+# Database
+# ------------------------------------------------------------
+# Render: use DATABASE_URL (managed Postgres)
+# Local: use DB_* from .env (your existing local Postgres config)
+# If you want SQLite locally, you can remove the local Postgres block and keep the SQLite fallback.
+DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL is not set")
+if DATABASE_URL:
+    # Production/Render path (or any environment providing DATABASE_URL)
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=IS_RENDER,  # SSL on Render; allow non-SSL locally if you ever set DATABASE_URL locally
+        )
+    }
+else:
+    if IS_RENDER:
+        # Hard fail on Render if DATABASE_URL isn't injected
+        raise RuntimeError(
+            "DATABASE_URL is not set on Render. "
+            "In Render: Web Service → Environment → Add from Database."
+        )
 
-DATABASES = {
-    "default": dj_database_url.parse(
-        DATABASE_URL,
-        conn_max_age=600,
-        ssl_require=True,
-    )
-}
+    # Local development Postgres via .env variables (your original local DB config)
+    # Requires these in .env: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+    db_name = env("DB_NAME", default=None)
+    db_user = env("DB_USER", default=None)
+    db_password = env("DB_PASSWORD", default=None)
+    db_host = env("DB_HOST", default=None)
+    db_port = env("DB_PORT", default=None)
 
+    if all([db_name, db_user, db_password, db_host, db_port]):
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": db_name,
+                "USER": db_user,
+                "PASSWORD": db_password,
+                "HOST": db_host,
+                "PORT": db_port,
+            }
+        }
+    else:
+        # Local fallback: SQLite (prevents your makemigrations from crashing)
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
+        }
 
+# ------------------------------------------------------------
 # Static & Media
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [Path(BASE_DIR) / 'static']
-STATIC_ROOT = Path(BASE_DIR) / 'staticfiles'
-MEDIA_URL = '/media/'
+# ------------------------------------------------------------
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_ROOT = Path(BASE_DIR) / 'media'
-# SECURITY: Ensure the media directory is not web-accessible in production (serve via a secure method, not directly by web server)
-# Set restrictive permissions on the media directory (e.g., 750 or 700) and never allow execution (no +x on files)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
-
-# --- Security Headers ---
-# Prevent clickjacking
-X_FRAME_OPTIONS = 'DENY'
-# Prevent content sniffing
+# ------------------------------------------------------------
+# Security Headers
+# ------------------------------------------------------------
+X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
-# XSS protection (modern browsers ignore, but safe to set)
 SECURE_BROWSER_XSS_FILTER = True
-# Referrer policy
-SECURE_REFERRER_POLICY = 'same-origin'
+SECURE_REFERRER_POLICY = "same-origin"
+
 # HSTS (enable in production only)
-SECURE_HSTS_SECONDS = 31536000  # 1 year
+# Only turn HSTS on when DEBUG is False, otherwise local dev gets annoying.
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-# CSP (Content Security Policy) - adjust as needed for your frontend
+# CSP (only effective if you have django-csp installed and middleware configured)
 CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", 'https://www.google.com/recaptcha/', 'https://www.gstatic.com/recaptcha/')
-CSP_STYLE_SRC = ("'self'", 'https://fonts.googleapis.com')
-CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com')
-CSP_IMG_SRC = ("'self'", 'data:')
+CSP_SCRIPT_SRC = ("'self'", "https://www.google.com/recaptcha/", "https://www.gstatic.com/recaptcha/")
+CSP_STYLE_SRC = ("'self'", "https://fonts.googleapis.com")
+CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
+CSP_IMG_SRC = ("'self'", "data:")
 CSP_CONNECT_SRC = ("'self'",)
-CSP_FRAME_SRC = ("'self'", 'https://www.google.com/recaptcha/')
+CSP_FRAME_SRC = ("'self'", "https://www.google.com/recaptcha/")
 
-# --- Session & Cookie Security ---
-SESSION_COOKIE_SECURE = True
+# ------------------------------------------------------------
+# Session & Cookie Security
+# ------------------------------------------------------------
+# Only force secure cookies/redirects when not DEBUG.
+SESSION_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
+CSRF_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SAMESITE = 'Lax'
-SECURE_SSL_REDIRECT = not DEBUG  # Only redirect to HTTPS in production
+CSRF_COOKIE_SAMESITE = "Lax"
 
+SECURE_SSL_REDIRECT = not DEBUG
 
-# --- Logging ---
-from config.logging_settings import LOGGING
+# ------------------------------------------------------------
+# Logging
+# ------------------------------------------------------------
+from config.logging_settings import LOGGING  # noqa: E402
 
-STORE_NAME = 'Home Craft 3d'
+# ------------------------------------------------------------
+# Store
+# ------------------------------------------------------------
+STORE_NAME = "Home Craft 3d"
 
-# Stripe API keys (set your sandbox keys in .env)
-STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
-STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+# ------------------------------------------------------------
+# Stripe
+# ------------------------------------------------------------
+STRIPE_PUBLIC_KEY = env("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY")
 
-# Add your reCAPTCHA v3 keys here
-RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
-RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
-RECAPTCHA_DEFAULT_ACTION = 'generic'
+# ------------------------------------------------------------
+# reCAPTCHA
+# ------------------------------------------------------------
+RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY")
+RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY")
+RECAPTCHA_DEFAULT_ACTION = "generic"
 RECAPTCHA_SCORE_THRESHOLD = 0.5
 
+# ------------------------------------------------------------
+# Email (development)
+# ------------------------------------------------------------
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "noreply@3dprintmarketplace.local"
 
-# Email backend (development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@3dprintmarketplace.local'
-
+# ------------------------------------------------------------
 # Password validation
+# ------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {'min_length': 8},
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8}},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# Email verification for new accounts and password resets
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # For django-allauth, if used
+# ------------------------------------------------------------
+# Account / Email verification (note: only applies if you're using allauth)
+# ------------------------------------------------------------
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_EMAIL_REQUIRED = True
-
-# If not using allauth, use Django's built-in email confirmation for password reset
-# For registration, send a confirmation email manually in your registration view
-# Example: after user creation, send a confirmation email with a token link
-# You can use django.core.mail.send_mail or Django's PasswordResetTokenGenerator
