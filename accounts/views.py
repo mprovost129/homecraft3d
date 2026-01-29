@@ -113,7 +113,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 if getattr(user, 'is_owner', False):
-                    return redirect('owner_dashboard')
+                    return redirect('accounts:owner_dashboard')
                 elif getattr(user, 'is_seller', False):
                     return redirect('/sellers/dashboard/')
                 else:

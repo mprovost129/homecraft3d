@@ -28,6 +28,10 @@ class User(AbstractUser):
     notify_admin_inapp = models.BooleanField(default=True, help_text="Show in-app notifications for admin actions")
     notify_admin_email = models.BooleanField(default=True, help_text="Email notifications for admin actions")
 
+    # Promo banner controls (owner only)
+    show_promo_banner = models.BooleanField(default=False, help_text="Show promo banner at top of site (owner only)")
+    promo_banner_text = models.CharField(max_length=255, blank=True, default='', help_text="Custom promo banner text")
+
 class SellerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     display_name = models.CharField(max_length=100)

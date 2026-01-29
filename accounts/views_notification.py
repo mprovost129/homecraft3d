@@ -1,3 +1,15 @@
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def notifications_list(request):
+    # Dummy implementation for notifications page
+    return render(request, 'accounts/notifications.html', {})
+
+@login_required
+def mark_notification_read(request, notification_id):
+    # Dummy implementation for marking notification as read
+    return render(request, 'accounts/notifications.html', {})
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models_notification import Notification

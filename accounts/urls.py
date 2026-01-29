@@ -1,8 +1,11 @@
 
+
 from django.urls import path, include
 from . import views
 from .views import owner_dashboard
 from django.contrib.auth import views as auth_views
+
+app_name = 'accounts'
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),

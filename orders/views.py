@@ -4,7 +4,12 @@ from .models import Order
 
 @login_required
 def order_history_view(request):
+    from reviews.models import Rating
     orders = Order.objects.filter(consumer=request.user).order_by('-created_at')
+    for order in orders:
+        for item in order.lineitem_set.all():
+            # Check if the user has rated this product (by this seller) in this order
+            item.seller_has_rating = Rating.objects.filter(product=item.product, user=request.user).exists()
     return render(request, 'orders/order_history.html', {'orders': orders})
 
 from django.shortcuts import render, redirect, get_object_or_404

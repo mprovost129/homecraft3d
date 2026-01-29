@@ -1,10 +1,9 @@
+{% if user.is_owner and user.show_promo_banner and user.promo_banner_text %}
 <div class="container-fluid bg-primary text-white py-2">
   <div class="container d-flex flex-wrap align-items-center justify-content-between">
     <div class="fw-bold">
-      <span class="me-3">🎉 Winter Sale: 20% off all digital downloads!</span>
-      <span class="me-3">🛡️ Secure Checkout</span>
-      <span class="me-3">💸 Money-Back Guarantee</span>
-      <span>⭐ Trusted by thousands of makers</span>
+      <span class="me-3">{{ user.promo_banner_text }}</span>
     </div>
   </div>
 </div>
+{% endif %}

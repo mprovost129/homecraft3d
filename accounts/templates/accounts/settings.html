@@ -37,6 +37,18 @@
     <div class="form-check">
       {{ form.notify_admin_email }} <label class="form-check-label" for="id_notify_admin_email">Email notifications for admin actions</label>
     </div>
+    {% if user.is_owner %}
+    <hr>
+    <h5>Promo Banner Controls</h5>
+    <div class="form-check mb-2">
+      {{ form.show_promo_banner }} <label class="form-check-label" for="id_show_promo_banner">Show promo banner at top of site</label>
+    </div>
+    <div class="mb-3">
+      <label for="id_promo_banner_text" class="form-label">Promo Banner Text</label>
+      {{ form.promo_banner_text }}
+      <div class="form-text">Set the text for the promo banner (e.g., Winter Sale: 20% off all digital downloads!)</div>
+    </div>
+    {% endif %}
     <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
   </form>
 </div>

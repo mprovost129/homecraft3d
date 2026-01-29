@@ -7,7 +7,7 @@ from two_factor.urls import urlpatterns as tf_urls
 urlpatterns = [
     path('', include(tf_urls)),  # Make 2FA login the default
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),
+    path('accounts/', include('accounts.urls', namespace='accounts')),
     path('', include('storefront.urls')),
     path('products/', include('products.urls')),
     path('orders/', include('orders.urls')),

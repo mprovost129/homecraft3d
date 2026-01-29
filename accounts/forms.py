@@ -48,6 +48,7 @@ class UserSettingsForm(forms.ModelForm):
             'notify_reviews_inapp', 'notify_reviews_email',
             'notify_orders_inapp', 'notify_orders_email',
             'notify_admin_inapp', 'notify_admin_email',
+            'show_promo_banner', 'promo_banner_text',
         ]
 
 class UserLoginForm(forms.Form):

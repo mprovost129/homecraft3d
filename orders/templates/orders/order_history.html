@@ -28,13 +28,11 @@
                       {{ item.product.name }} (x{{ item.quantity }})
                       <br>
                       <small>Seller: {{ item.product.seller.user.username }}
-                        {% with seller=item.product.seller %}
-                          {% if not seller.ratings.filter(user=request.user, order=order).exists %}
-                            <a href="{% url 'rate_seller' seller.id order.id %}" class="btn btn-link btn-sm p-0 ms-2">Rate Seller</a>
-                          {% else %}
-                            <span class="text-success ms-2">Rated</span>
-                          {% endif %}
-                        {% endwith %}
+                        {% if not item.seller_has_rating %}
+                          <a href="{% url 'rate_seller' item.product.seller.id order.id %}" class="btn btn-link btn-sm p-0 ms-2">Rate Seller</a>
+                        {% else %}
+                          <span class="text-success ms-2">Rated</span>
+                        {% endif %}
                       </small>
                     </li>
                   {% endfor %}
