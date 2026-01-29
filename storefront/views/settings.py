@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.shortcuts import render, redirect
-from .models import StorefrontSettings
-from .forms import StorefrontSettingsForm
+from ..models import StorefrontSettings
+from ..forms import StorefrontSettingsForm
 
 def is_owner_or_admin(user):
     return user.is_authenticated and (user.is_superuser or getattr(user, 'is_owner', False))

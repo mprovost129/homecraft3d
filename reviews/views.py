@@ -1,4 +1,3 @@
-def review_list(request):
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Rating
@@ -13,7 +12,7 @@ def review_list(request):
 def review_create(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     if Rating.objects.filter(product=product, user=request.user).exists():
-        return redirect('product_detail', product_id=product.id)
+        return redirect('product_detail', product_id=product.pk)
     if request.method == 'POST':
         form = RatingForm(request.POST)
         if form.is_valid():
@@ -21,7 +20,7 @@ def review_create(request, product_id):
             rating.product = product
             rating.user = request.user
             rating.save()
-            return redirect('product_detail', product_id=product.id)
+            return redirect('product_detail', product_id=product.pk)
     else:
         form = RatingForm()
     return render(request, 'reviews/review_form.html', {'form': form, 'product': product})

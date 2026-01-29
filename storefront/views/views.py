@@ -1,4 +1,6 @@
 # Checkout and order confirmation views
+from products.models import Product, Category
+from ..models import StorefrontSettings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from products.models import Product
@@ -34,9 +36,6 @@ def order_confirmation_view(request, order_id):
     order = Order.objects.get(id=order_id)
     return render(request, 'storefront/order_confirmation.html', {'order': order})
 # from django.shortcuts import render  # Already imported above with redirect
-
-from products.models import Product, Category
-from .models import StorefrontSettings
 
 def get_theme_mode():
     settings_obj = StorefrontSettings.objects.first()
