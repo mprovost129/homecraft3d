@@ -1,3 +1,7 @@
+def empty_cart(request):
+    if request.method == 'POST':
+        request.session['cart'] = {}
+    return redirect('cart')
 from django.shortcuts import render, redirect, get_object_or_404
 from products.models import Product
 
@@ -15,16 +19,24 @@ def cart_view(request):
     return render(request, 'storefront/cart.html', {'cart_items': cart_items, 'total': total})
 
 def add_to_cart(request, product_id):
+    from django.http import JsonResponse
     cart = request.session.get('cart', {})
     cart[str(product_id)] = cart.get(str(product_id), 0) + 1
     request.session['cart'] = cart
+    cart_item_count = sum(cart.values())
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'success': True, 'cart_item_count': cart_item_count})
     return redirect('cart')
 
 def remove_from_cart(request, product_id):
+    from django.http import JsonResponse
     cart = request.session.get('cart', {})
     if str(product_id) in cart:
         del cart[str(product_id)]
         request.session['cart'] = cart
+    cart_item_count = sum(cart.values())
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'success': True, 'cart_item_count': cart_item_count})
     return redirect('cart')
 
 def update_cart(request):

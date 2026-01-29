@@ -2,37 +2,52 @@
 {% block title %}Order History | 3D Print Marketplace{% endblock %}
 {% block content %}
 <div class="container mt-4">
-  <h1>Order History</h1>
-  <hr>
-  {% if orders %}
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Date</th>
-          <th>Status</th>
-          <th>Items</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for order in orders %}
-        <tr>
-          <td>{{ order.id }}</td>
-          <td>{{ order.created_at|date:'Y-m-d H:i' }}</td>
-          <td>{{ order.status }}</td>
-          <td>
-            <ul>
-              {% for item in order.lineitem_set.all %}
-                <li>{{ item.product.name }} (x{{ item.quantity }})</li>
-              {% endfor %}
-            </ul>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>You have no orders yet.</p>
-  {% endif %}
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h1 class="card-title mb-3">Order History</h1>
+      {% if orders %}
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Order ID</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Items</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+            <tr>
+              <td>{{ order.id }}</td>
+              <td>{{ order.created_at|date:'Y-m-d H:i' }}</td>
+              <td>{{ order.status }}</td>
+              <td>
+                <ul class="mb-0 ps-3">
+                  {% for item in order.lineitem_set.all %}
+                    <li>
+                      {{ item.product.name }} (x{{ item.quantity }})
+                      <br>
+                      <small>Seller: {{ item.product.seller.user.username }}
+                        {% with seller=item.product.seller %}
+                          {% if not seller.ratings.filter(user=request.user, order=order).exists %}
+                            <a href="{% url 'rate_seller' seller.id order.id %}" class="btn btn-link btn-sm p-0 ms-2">Rate Seller</a>
+                          {% else %}
+                            <span class="text-success ms-2">Rated</span>
+                          {% endif %}
+                        {% endwith %}
+                      </small>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="alert alert-info mb-0">You have no orders yet.</div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

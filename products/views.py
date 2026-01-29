@@ -42,18 +42,29 @@ from django.contrib import messages
 def product_list(request):
     # Search and filtering
     from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-    products = Product.objects.filter(seller=request.user.seller, draft=False)
+    products = Product.objects.filter(draft=False)
     categories = Category.objects.all()
+    sellers = User.objects.filter(is_seller=True)
     query = request.GET.get('q', '').strip()
     category_id = request.GET.get('category', '')
     price_min = request.GET.get('price_min', '')
     price_max = request.GET.get('price_max', '')
+    tags = request.GET.get('tags', '').strip()
+    seller_id = request.GET.get('seller', '')
+    min_rating = request.GET.get('min_rating', '')
     sort = request.GET.get('sort', 'newest')
     page = request.GET.get('page', 1)
     per_page = 9
 
     if query:
         products = products.filter(name__icontains=query)
+    if tags:
+        for tag in tags.split(','):
+            tag = tag.strip()
+            if tag:
+                products = products.filter(tags__icontains=tag)
+    if seller_id:
+        products = products.filter(seller__user__id=seller_id)
         # Build nested category list for dropdown
         def get_category_tree(categories, parent=None, level=0):
             tree = []
@@ -86,6 +97,19 @@ def product_list(request):
     else:  # newest
         products = products.order_by('-id')
 
+    # Filter by min_rating (aggregate)
+    from .models_review import ProductReview
+    from django.db.models import Avg
+    if min_rating:
+        try:
+            min_rating_val = float(min_rating)
+            product_ids = [p.pk for p in products]
+            ratings = ProductReview.objects.filter(product_id__in=product_ids).values('product').annotate(avg=Avg('rating'))
+            ids = [r['product'] for r in ratings if r['avg'] and r['avg'] >= min_rating_val]
+            products = products.filter(id__in=ids)
+        except Exception:
+            pass
+
     paginator = Paginator(products, per_page)
     try:
         products_page = paginator.page(page)
@@ -111,10 +135,14 @@ def product_list(request):
     return render(request, 'products/product_list.html', {
         'products': products_page,
         'categories': categories,
+        'sellers': sellers,
         'query': query,
         'category_id': category_id,
         'price_min': price_min,
         'price_max': price_max,
+        'tags': tags,
+        'seller_id': seller_id,
+        'min_rating': min_rating,
         'sort': sort,
         'paginator': paginator,
         'page_obj': products_page,
@@ -245,9 +273,25 @@ def product_detail(request, product_id):
     user_review = None
     if request.user.is_authenticated:
         user_review = reviews.filter(user=request.user).first()
+
+    # Related products: use StorefrontSettings to determine filter mode
+    from storefront.models import StorefrontSettings
+    mode = 'most_purchased'
+    settings_obj = StorefrontSettings.objects.first()
+    if settings_obj:
+        mode = settings_obj.featured_products_mode
+    related_qs = Product.objects.filter(category=product.category).exclude(pk=product.pk)
+    if mode == 'most_viewed':
+        related_products = related_qs.order_by('-view_count')[:4]
+    elif mode == 'manual':
+        related_products = related_qs.filter(featured_manual=True)[:4]
+    else:  # most_purchased (default)
+        related_products = related_qs.order_by('-purchase_count', '-view_count')[:4]
+
     return render(request, 'products/product_detail.html', {
         'product': product,
         'reviews': reviews,
         'avg_rating': avg_rating,
         'user_review': user_review,
+        'related_products': related_products,
     })

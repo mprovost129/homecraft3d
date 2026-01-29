@@ -1,3 +1,80 @@
+/* Light/Dark Theme Support */
+body.theme-dark {
+    background-color: #181a1b;
+    color: #e8e6e3;
+}
+body.theme-dark .card,
+body.theme-dark .modal-content {
+    background-color: #23272b;
+    color: #e8e6e3;
+}
+body.theme-dark .navbar,
+body.theme-dark .footer,
+body.theme-dark .bg-light {
+    background-color: #23272b !important;
+    color: #e8e6e3 !important;
+}
+body.theme-dark .btn-primary {
+    background-color: #375a7f;
+    border-color: #375a7f;
+}
+body.theme-dark .btn-outline-primary {
+    color: #e8e6e3;
+    border-color: #e8e6e3;
+}
+body.theme-dark .table {
+    color: #e8e6e3;
+}
+body.theme-dark .form-control {
+    background-color: #23272b;
+    color: #e8e6e3;
+    border-color: #444;
+}
+body.theme-dark .form-select {
+    background-color: #23272b;
+    color: #e8e6e3;
+    border-color: #444;
+}
+body.theme-dark .alert {
+    background-color: #23272b;
+    color: #e8e6e3;
+    border-color: #444;
+}
+body.theme-dark .list-group-item {
+    background-color: #23272b;
+    color: #e8e6e3;
+    border-color: #444;
+}
+body.theme-dark .dropdown-menu {
+    background-color: #23272b;
+    color: #e8e6e3;
+}
+body.theme-dark .pagination .page-link {
+    background-color: #23272b;
+    color: #e8e6e3;
+    border-color: #444;
+}
+body.theme-dark .badge {
+    background-color: #444;
+    color: #e8e6e3;
+}
+body.theme-dark .border-end {
+    border-color: #444 !important;
+}
+body.theme-dark .shadow-sm,
+body.theme-dark .shadow {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.3)!important;
+}
+body.theme-dark .bg-success,
+body.theme-dark .bg-warning,
+body.theme-dark .bg-info {
+    color: #181a1b !important;
+}
+
+body.theme-light {
+    background-color: #fff;
+    color: #212529;
+}
 /* Modern storefront enhancements */
 
 .navbar-brand span.fw-bold {

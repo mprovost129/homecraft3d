@@ -2,29 +2,33 @@
 {% block title %}Product Analytics | {{ STORE_NAME }}{% endblock %}
 {% block content %}
 <div class="container mt-4">
-  <h1>Product Analytics</h1>
-  <table class="table table-bordered table-striped mt-3">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Views</th>
-        <th>Purchases</th>
-        <th>Conversion Rate (%)</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in analytics %}
-      <tr>
-        <td><a href="{% url 'edit_product' row.product.id %}">{{ row.product.name }}</a></td>
-        <td>{{ row.views }}</td>
-        <td>{{ row.purchases }}</td>
-        <td>{{ row.conversion_rate|floatformat:2 }}</td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="4">No products found.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h1 class="card-title mb-3">Product Analytics</h1>
+      <table class="table table-bordered table-striped align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Product</th>
+            <th>Views</th>
+            <th>Purchases</th>
+            <th>Conversion Rate (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in analytics %}
+          <tr>
+            <td><a href="{% url 'edit_product' row.product.id %}">{{ row.product.name }}</a></td>
+            <td>{{ row.views }}</td>
+            <td>{{ row.purchases }}</td>
+            <td>{{ row.conversion_rate|floatformat:2 }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">No products found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+    </div>
+  </div>
 </div>
 {% endblock %}

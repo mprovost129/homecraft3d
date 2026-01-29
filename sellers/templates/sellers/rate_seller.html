@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Rate Seller | 3D Print Marketplace{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h1 class="card-title mb-3">Rate Seller: {{ seller.user.username }}</h1>
+      <p>Order #{{ order.id }} | {{ order.created_at|date:'Y-m-d' }}</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit Rating</button>
+        <a href="{% url 'order_history' %}" class="btn btn-secondary ms-2">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

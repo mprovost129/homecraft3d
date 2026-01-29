@@ -1,27 +1,34 @@
-# 3D Print Marketplace Build Steps
 
-## Phase 1: Storefront & Authentication
-1. Refine homepage: product listing, featured/new products, navigation
-2. Implement user registration, login, logout (accounts app)
-3. Add profile page for users
+# 3D Print Marketplace: Next Steps
 
-## Phase 2: Seller & Product Management
-4. Seller dashboard: product upload, media gallery, Stripe setup
-5. Product CRUD: categories, licenses, file/media upload, validation
+## User Experience & Storefront
+- Product recommendations (related products, “You may also like”)
+- Enhanced search and advanced filters (by price, seller, rating, tags)
+- Responsive and accessible design polish
 
-## Phase 3: Orders & Payments
-6. Order flow: cart, checkout, Stripe integration, order history
-7. Payment models: payouts, fees, refund handling
+## Orders & Account Management
+- Order history and order detail pages for users
+- Download links for digital purchases
+- Order status tracking and notifications
 
-## Phase 4: Moderation, Reviews, Legal
-8. Moderation dashboard: reports, DMCA, flags
-9. Reviews: ratings, feedback
-10. Legal pages: terms, privacy, refund policy
+## Reviews & Community
+- Product reviews and ratings (write, display, moderate)
+- Seller ratings and feedback
 
-## Phase 5: Static/Media & Polish
-11. Static files, media storage, secure delivery
-12. UI/UX improvements, error handling, testing
+## Marketing & Trust
+- Promo banners, featured products, testimonials
+- Trust badges (secure checkout, money-back guarantee)
+
+## Admin & Seller Tools
+- Sales analytics dashboard
+- Inventory alerts and management
+- Bulk product upload (CSV or Excel)
+
+## Testing & Deployment
+- Automated tests (unit, integration, UI)
+- Accessibility and performance checks
+- Deployment scripts and documentation
 
 ---
 
-Refer to this file for step-by-step progress and next actions as we build out the marketplace.
+Refer to this file for ongoing progress and next actions as we build out the marketplace.

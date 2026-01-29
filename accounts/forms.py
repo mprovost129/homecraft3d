@@ -7,12 +7,13 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [
-            'profile_picture', 'first_name', 'last_name', 'email', 'phone_number', 'address1', 'address2', 'city', 'state', 'zip_code'
+            'profile_picture', 'first_name', 'last_name', 'email', 'phone_number', 'address1', 'address2', 'city', 'state', 'zip_code', 'theme_preference'
         ]
         widgets = {
             'email': forms.EmailInput(attrs={'readonly': 'readonly'}),
             'first_name': forms.TextInput(attrs={'readonly': 'readonly'}),
             'last_name': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'theme_preference': forms.Select(attrs={'class': 'form-select'})
         }
 
 

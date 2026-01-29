@@ -69,6 +69,28 @@
 					<option value="name" {% if sort == 'name' %}selected{% endif %}>Name</option>
 				</select>
 			</div>
+			<div class="mb-2">
+				<label for="tags" class="form-label">Tags</label>
+				<input type="text" class="form-control" id="tags" name="tags" value="{{ tags }}" placeholder="e.g. vase, dragon, toy">
+			</div>
+			<div class="mb-2">
+				<label for="seller" class="form-label">Seller</label>
+				<select class="form-select" id="seller" name="seller">
+					<option value="">All Sellers</option>
+					{% for s in sellers %}
+						<option value="{{ s.id }}" {% if seller_id|stringformat:'s' == s.id|stringformat:'s' %}selected{% endif %}>{{ s.user.username }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="mb-2">
+				<label for="min_rating" class="form-label">Min Rating</label>
+				<select class="form-select" id="min_rating" name="min_rating">
+					<option value="">Any</option>
+					{% for r in "12345" %}
+						<option value="{{ r }}" {% if min_rating|stringformat:'s' == r|stringformat:'s' %}selected{% endif %}>{{ r }}+</option>
+					{% endfor %}
+				</select>
+			</div>
 			<button type="submit" class="btn btn-primary w-100">Filter</button>
 		</form>
 	</div>
@@ -183,15 +205,54 @@
 	#category-sidebar-tree ul { margin-bottom: 0; }
 </style>
 
+
 <div class="row row-cols-1 row-cols-md-3 g-4">
 	{% for product in products %}
 		<div class="col">
-			<div class="card h-100">
-				<div class="card-body">
-					<h5 class="card-title">{{ product.name }}</h5>
+			<div class="card h-100 shadow border-0 product-card">
+				{% if product.media.first.image %}
+					<a href="{% url 'product_detail' product.id %}">
+						<img src="{{ product.media.first.image.url }}" class="card-img-top product-img" alt="{{ product.name }}">
+					</a>
+				{% endif %}
+				<div class="card-body d-flex flex-column">
+					<div class="d-flex align-items-center gap-2 justify-content-between mb-2">
+						<span class="d-flex align-items-center gap-2">
+							<a href="{% url 'product_detail' product.id %}" class="text-decoration-none fw-bold">{{ product.name }}</a>
+							{% if product.featured_manual %}
+								<span class="badge bg-warning text-dark" title="Featured">★</span>
+							{% endif %}
+							{% if product.is_digital %}
+								<span class="badge bg-info text-dark" title="Digital">Digital</span>
+							{% endif %}
+							{% if product.is_physical %}
+								<span class="badge bg-success" title="Physical">Physical</span>
+							{% endif %}
+						</span>
+						{% if user.is_authenticated %}
+							{% if product.id in wishlist_product_ids %}
+								<a href="{% url 'remove_from_wishlist' product.id %}" class="text-danger" title="Remove from wishlist"><span style="font-size:1.3em;">&#10084;</span></a>
+							{% else %}
+								<a href="{% url 'add_to_wishlist' product.id %}" class="text-muted" title="Add to wishlist"><span style="font-size:1.3em;">&#9825;</span></a>
+							{% endif %}
+						{% endif %}
+					</div>
 					<p class="card-text">{{ product.description|truncatewords:20 }}</p>
 					<p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
-					<a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary">View</a>
+					{% if product.is_physical %}
+						<p class="card-text">
+							<strong>Stock:</strong>
+							{% if product.inventory == 0 %}
+								<span class="text-danger">Out of stock</span>
+							{% else %}
+								{{ product.inventory|default:'N/A' }}
+							{% endif %}
+						</p>
+					{% endif %}
+					<div class="d-grid gap-2 mt-auto">
+						<a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary">View Details</a>
+						<button class="btn btn-primary btn-add-to-cart" data-product-id="{{ product.id }}">Add to Cart</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -233,4 +294,7 @@
 	</ul>
 </nav>
 {% endif %}
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/cart.js' %}"></script>
 {% endblock %}

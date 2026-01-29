@@ -38,6 +38,12 @@ def order_confirmation_view(request, order_id):
 from products.models import Product, Category
 from .models import StorefrontSettings
 
+def get_theme_mode():
+    settings_obj = StorefrontSettings.objects.first()
+    if settings_obj:
+        return settings_obj.theme_mode
+    return 'auto'
+
 def home(request):
     # Get featured mode from StorefrontSettings (admin only)
     mode = 'manual'

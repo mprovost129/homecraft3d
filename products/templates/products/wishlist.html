@@ -2,27 +2,30 @@
 {% block title %}Wishlist | 3D Print Marketplace{% endblock %}
 {% block content %}
 <div class="container mt-4">
-  <h1>Your Wishlist</h1>
-  <hr>
-  {% if wishlist.products.all %}
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for product in wishlist.products.all %}
-        <tr>
-          <td><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></td>
-          <td><a href="{% url 'remove_from_wishlist' product.id %}" class="btn btn-danger btn-sm">Remove</a></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>Your wishlist is empty.</p>
-  {% endif %}
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h1 class="card-title mb-3">Your Wishlist</h1>
+      {% if wishlist.products.all %}
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Product</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in wishlist.products.all %}
+            <tr>
+              <td><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></td>
+              <td><a href="{% url 'remove_from_wishlist' product.id %}" class="btn btn-danger btn-sm">Remove</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="alert alert-info mb-0">Your wishlist is empty.</div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

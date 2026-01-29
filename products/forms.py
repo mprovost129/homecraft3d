@@ -39,9 +39,10 @@ class ProductForm(forms.ModelForm):
     inventory = forms.IntegerField(required=False, label="Inventory (stock)", min_value=0, help_text="Required for physical products.")
     meta_title = forms.CharField(required=False, max_length=70, label="SEO Meta Title", help_text="Max 70 characters.")
     meta_description = forms.CharField(required=False, max_length=160, label="SEO Meta Description", widget=forms.Textarea(attrs={'rows':2}), help_text="Max 160 characters.")
+    tags = forms.CharField(required=False, max_length=255, label="Tags", help_text="Comma-separated tags for search and filtering.")
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'category', 'license', 'draft', 'inventory', 'meta_title', 'meta_description']
+        fields = ['name', 'description', 'price', 'category', 'license', 'draft', 'inventory', 'meta_title', 'meta_description', 'tags']
 
     def clean_inventory(self):
         inventory = self.cleaned_data.get('inventory')

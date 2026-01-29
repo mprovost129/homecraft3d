@@ -19,14 +19,25 @@ def checkout_view(request):
             'subtotal': subtotal
         })
         total += subtotal
+    error = None
     if request.method == 'POST':
-        # Create order and line items
-        order = Order.objects.create(consumer=request.user, status='Pending')
+        # Stock validation
         for item in cart_items:
-            LineItem.objects.create(order=order, product=item['product'], quantity=item['quantity'])
-        request.session['cart'] = {}
-        return redirect('order_confirmation', order_id=order.id)
-    return render(request, 'storefront/checkout.html', {'cart_items': cart_items, 'total': total})
+            product = item['product']
+            quantity = item['quantity']
+            # Only check stock for physical products
+            if getattr(product, 'is_physical', False):
+                if product.inventory is not None and quantity > product.inventory:
+                    error = f"Not enough stock for {product.name}. Only {product.inventory} left."
+                    break
+        if not error:
+            # Create order and line items
+            order = Order.objects.create(consumer=request.user, status='Pending')
+            for item in cart_items:
+                LineItem.objects.create(order=order, product=item['product'], quantity=item['quantity'])
+            request.session['cart'] = {}
+            return redirect('order_confirmation', order_id=order.id)
+    return render(request, 'storefront/checkout.html', {'cart_items': cart_items, 'total': total, 'error': error})
 
 def order_confirmation_view(request, order_id):
     order = Order.objects.get(id=order_id)

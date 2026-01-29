@@ -2,8 +2,13 @@
 {% block title %}Payment Successful | {{ STORE_NAME }}{% endblock %}
 {% block content %}
 <div class="container mt-5">
-  <h2>Payment Successful</h2>
-  <p>Thank you for your purchase! Your payment was processed successfully.</p>
-  <a href="/orders/dashboard/" class="btn btn-primary">Go to Dashboard</a>
+  <div class="card shadow-sm text-center p-4">
+    <div class="mb-3">
+      <span class="display-1 text-success"><i class="bi bi-check-circle"></i></span>
+    </div>
+    <h2 class="mb-3">Payment Successful</h2>
+    <p class="lead">Thank you for your purchase! Your payment was processed successfully.</p>
+    <a href="/orders/dashboard/" class="btn btn-primary">Go to Dashboard</a>
+  </div>
 </div>
 {% endblock %}

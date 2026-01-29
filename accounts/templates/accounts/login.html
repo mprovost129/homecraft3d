@@ -2,15 +2,31 @@
 {% block title %}Login | 3D Print Marketplace{% endblock %}
 {% block content %}
 <div class="container mt-5">
-  <h2>Login</h2>
-  <form method="post">
-    {% csrf_token %}
-    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-    {{ form.username.label_tag }} {{ form.username }}<br>
-    {{ form.password.label_tag }} {{ form.password }}<br>
-    {{ form.captcha }}
-    <button type="submit" class="btn btn-primary">Login</button>
-  </form>
-  <p class="mt-3">Don't have an account? <a href="{% url 'accounts:register' %}">Register here</a>.</p>
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Login</h2>
+          <form method="post">
+            {% csrf_token %}
+            {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+            <div class="mb-3">
+              {{ form.username.label_tag }}
+              {{ form.username }}
+            </div>
+            <div class="mb-3">
+              {{ form.password.label_tag }}
+              {{ form.password }}
+            </div>
+            <div class="mb-3">
+              {{ form.captcha }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+          </form>
+          <p class="mt-3 mb-0">Don't have an account? <a href="{% url 'accounts:register' %}">Register here</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

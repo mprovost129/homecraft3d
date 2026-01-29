@@ -18,7 +18,10 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
+{% load static %}
+{% with theme_mode=theme_mode|default:'auto' %}
+<body class="theme-{{ theme_mode }}">
+  {% include 'includes/promo_banner.html' %}
     {% block navbar %}
       {% include 'includes/navbar.html' %}
     {% endblock %}

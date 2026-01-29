@@ -18,7 +18,12 @@
       <tbody>
         {% for item in cart_items %}
         <tr>
-          <td><a href="/products/{{ item.product.id }}/">{{ item.product.name }}</a></td>
+          <td>
+            {% if item.product.media.first.image %}
+              <img src="{{ item.product.media.first.image.url }}" alt="{{ item.product.name }}" style="height:48px;width:48px;object-fit:cover;margin-right:8px;vertical-align:middle;">
+            {% endif %}
+            <a href="/products/{{ item.product.id }}/">{{ item.product.name }}</a>
+          </td>
           <td><input type="number" name="quantity_{{ item.product.id }}" value="{{ item.quantity }}" min="1" class="form-control" style="width:80px;"></td>
           <td>${{ item.product.price }}</td>
           <td>${{ item.subtotal }}</td>
@@ -35,6 +40,11 @@
     <button type="submit" class="btn btn-primary">Update Cart</button>
     {% if cart_items %}
       <button id="checkout-button" type="button" class="btn btn-success ms-2">Proceed to Checkout</button>
+      <a href="/" class="btn btn-outline-secondary ms-2">Continue Shopping</a>
+      <form method="post" action="{% url 'empty_cart' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger ms-2">Empty Cart</button>
+      </form>
     {% endif %}
   </form>
 </div>

@@ -12,6 +12,14 @@ class User(AbstractUser):
     city = models.CharField(max_length=100, blank=True)
     state = models.CharField(max_length=100, blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
+    # Theme preference: light, dark, auto, or empty (use site default)
+    THEME_CHOICES = [
+        ("", "Use Site Default"),
+        ("light", "Light Mode"),
+        ("dark", "Dark Mode"),
+        ("auto", "Auto (System Preference)")
+    ]
+    theme_preference = models.CharField(max_length=10, choices=THEME_CHOICES, blank=True, default="", help_text="User's theme preference.")
     # Notification preferences
     notify_reviews_inapp = models.BooleanField(default=True, help_text="Show in-app notifications for reviews")
     notify_reviews_email = models.BooleanField(default=True, help_text="Email notifications for reviews")

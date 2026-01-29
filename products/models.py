@@ -25,6 +25,8 @@ class Product(models.Model):
     height_mm = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     draft = models.BooleanField(default=False, help_text="If checked, product is a draft and not visible to buyers.")
     inventory = models.IntegerField(null=True, blank=True, help_text="Stock for physical products. Leave blank for digital products.")
+    # Tag support for advanced search
+    tags = models.CharField(max_length=255, blank=True, help_text="Comma-separated tags for search and filtering.")
 
     # Featured product logic
     featured_manual = models.BooleanField(default=False, help_text="Show as featured if checked")

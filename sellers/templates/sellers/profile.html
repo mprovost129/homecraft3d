@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Seller Profile | 3D Print Marketplace{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h1 class="card-title mb-3">Seller: {{ seller.user.username }}</h1>
+      <p><strong>Member since:</strong> {{ seller.user.date_joined|date:'Y-m-d' }}</p>
+      <div class="mb-3">
+        <strong>Average Rating:</strong>
+        {% with ratings=seller.ratings.all %}
+          {% if ratings %}
+            <span class="text-warning">&#9733;</span>
+            {{ ratings|average:'score'|floatformat:1 }} / 5 ({{ ratings|length }} review{{ ratings|length|pluralize }})
+          {% else %}
+            <span class="text-muted">No ratings yet.</span>
+          {% endif %}
+        {% endwith %}
+      </div>
+      <h4>Recent Feedback</h4>
+      <ul class="list-group mb-3">
+        {% for rating in seller.ratings.all|slice:':5' %}
+          <li class="list-group-item">
+            <span class="fw-bold">{{ rating.user.username }}</span>
+            <span class="text-warning ms-2">&#9733;</span> {{ rating.score }}
+            <span class="text-muted ms-2 small">{{ rating.created_at|date:'Y-m-d' }}</span>
+            <div>{{ rating.comment }}</div>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No feedback yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

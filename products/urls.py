@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import wishlist_view, add_to_wishlist, remove_from_wishlist
+from django.urls import include
 
 urlpatterns = [
     path('', views.product_list, name='product_list'),
@@ -13,4 +14,6 @@ urlpatterns = [
     path('categories/edit/<int:category_id>/', views.category_edit, name='category_edit'),
     path('categories/delete/<int:category_id>/', views.category_delete, name='category_delete'),
     path('categories/reorder/<int:category_id>/<str:direction>/', views.category_reorder, name='category_reorder'),
+    # Review URLs for product detail integration
+    path('reviews/', include('reviews.urls')),
 ]

@@ -19,7 +19,47 @@
       <label>Upload 3D Files</label>
       <input type="file" name="file" multiple class="form-control">
     </div>
+    <hr>
+    <h5>Product Variants</h5>
+    <div class="mb-3">
+      {{ variant_formset.management_form }}
+      <table class="table table-bordered align-middle">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Value</th>
+            <th>Price</th>
+            <th>Inventory</th>
+            <th>Delete?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for form in variant_formset.forms %}
+            <tr>
+              <td>{{ form.name }}</td>
+              <td>{{ form.value }}</td>
+              <td>{{ form.price }}</td>
+              <td>{{ form.inventory }}</td>
+              <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <small class="text-muted">Add, edit, or remove product variants (e.g., size, color, etc.).</small>
+    </div>
     <button type="submit" class="btn btn-success">Save Changes</button>
+    <div class="form-check mt-3">
+      <input class="form-check-input" type="checkbox" id="agree_terms" name="agree_terms" required>
+      <label class="form-check-label" for="agree_terms">
+        I agree to the <a href="/legal/terms/" target="_blank">Terms & Conditions</a>
+      </label>
+    </div>
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="agree_privacy" name="agree_privacy" required>
+      <label class="form-check-label" for="agree_privacy">
+        I have read the <a href="/legal/privacy/" target="_blank">Privacy Policy</a>
+      </label>
+    </div>
     <a href="{% url 'manage_products' %}" class="btn btn-secondary ms-2">Cancel</a>
   </form>
   <hr>
