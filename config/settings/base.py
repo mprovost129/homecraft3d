@@ -16,6 +16,8 @@ environ.Env.read_env(env_path)
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DJANGO_DEBUG')
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+if 'homecraft3d.onrender.com' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('homecraft3d.onrender.com')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
