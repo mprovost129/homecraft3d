@@ -1,6 +1,7 @@
 import environ
 from pathlib import Path
 import os
+import dj_database_url
 
 BASE_DIR = 'C:\\Users\\mprov\\Dropbox\\Projects\\home_craft_3d\\3dprint_marketplace'
 
@@ -79,6 +80,19 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not set")
+
+DATABASES = {
+    "default": dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=True,
+    )
+}
 
 
 # Static & Media
