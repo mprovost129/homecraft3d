@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Environment
 # ------------------------------------------------------------
 env = environ.Env(
-    DJANGO_DEBUG=(bool, True),
+    DJANGO_DEBUG=(bool, False),
 )
 
 # Read .env from project root (BASE_DIR/.env)
