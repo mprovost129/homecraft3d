@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Consumer Dashboard | {{ STORE_NAME }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Consumer Dashboard</h1>
+  <hr>
+  <h3>Order & Download History</h3>
+  <ul class="list-group mb-4">
+    {% for order in orders %}
+      <li class="list-group-item">
+        <strong>Order #{{ order.id }}</strong> - {{ order.created_at|date:"Y-m-d H:i" }} - Status: {{ order.status }}
+        <ul>
+          {% for item in order.lineitem_set.all %}
+            <li>{{ item.product.name }} x{{ item.quantity }}</li>
+          {% endfor %}
+        </ul>
+        <form method="post" class="d-inline">
+          {% csrf_token %}
+          <input type="hidden" name="refund_order_id" value="{{ order.id }}">
+          <button type="submit" class="btn btn-sm btn-warning">Request Refund</button>
+        </form>
+      </li>
+    {% empty %}
+      <li class="list-group-item">No orders yet.</li>
+    {% endfor %}
+  </ul>
+  <h3>Downloads</h3>
+  <ul class="list-group mb-4">
+    {% for download in downloads %}
+      <li class="list-group-item">
+        {{ download.file.name|basename }} - {{ download.downloaded_at|date:"Y-m-d H:i" }}
+        <a href="{{ download.file.url }}" download class="btn btn-sm btn-outline-primary ms-2">Download</a>
+      </li>
+    {% empty %}
+      <li class="list-group-item">No downloads yet.</li>
+    {% endfor %}
+  </ul>
+  <h3>Recommendations</h3>
+  <div class="row mb-4">
+    {% for product in recommendations %}
+      <div class="col-md-3 mb-2">
+        <div class="card">
+          {% if product.media.first.image %}
+            <img src="{{ product.media.first.image.url }}" class="card-img-top" alt="Product image">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title"><a href="/products/{{ product.id }}/">{{ product.name }}</a></h5>
+            <p class="card-text">{{ product.description|truncatewords:15 }}</p>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p>No recommendations at this time.</p>
+    {% endfor %}
+  </div>
+  {% if refund_requested %}
+    <div class="alert alert-success">Refund request submitted!</div>
+  {% endif %}
+</div>
+{% endblock %}

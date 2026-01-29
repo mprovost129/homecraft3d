@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Profile | 3D Print Marketplace{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Profile</h1>
+  <hr>
+  {% if success %}
+    <div class="alert alert-success">Profile updated successfully.</div>
+  {% endif %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-3">
+          {{ form.first_name.label_tag }}
+          {{ form.first_name }}
+        </div>
+        <div class="mb-3">
+          {{ form.last_name.label_tag }}
+          {{ form.last_name }}
+        </div>
+        <div class="mb-3">
+          {{ form.email.label_tag }}
+          {{ form.email }}
+        </div>
+        <div class="mb-3">
+          {{ form.phone_number.label_tag }}
+          {{ form.phone_number }}
+        </div>
+        <div class="mb-3">
+          {{ form.address1.label_tag }}
+          {{ form.address1 }}
+        </div>
+        <div class="mb-3">
+          {{ form.address2.label_tag }}
+          {{ form.address2 }}
+        </div>
+        <div class="mb-3">
+          {{ form.city.label_tag }}
+          {{ form.city }}
+        </div>
+        <div class="mb-3">
+          {{ form.state.label_tag }}
+          {{ form.state }}
+        </div>
+        <div class="mb-3">
+          {{ form.zip_code.label_tag }}
+          {{ form.zip_code }}
+        </div>
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

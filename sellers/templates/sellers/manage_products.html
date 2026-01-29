@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Manage Products | {{ STORE_NAME }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Upload Product</h1>
+  <form method="post" enctype="multipart/form-data" class="mb-4">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="form-group">
+      {{ form.inventory.label_tag }}
+      {{ form.inventory }}
+      {{ form.inventory.errors }}
+      <small class="form-text text-muted">{{ form.inventory.help_text }}</small>
+    </div>
+    <h5>Measurements (mm)</h5>
+    <div class="row mb-2">
+      <div class="col">{{ form.length_mm.label_tag }} {{ form.length_mm }}</div>
+      <div class="col">{{ form.width_mm.label_tag }} {{ form.width_mm }}</div>
+      <div class="col">{{ form.height_mm.label_tag }} {{ form.height_mm }}</div>
+    </div>
+    <h5>Media Gallery</h5>
+    <div class="mb-2">
+      <label>Upload Images</label>
+      <input type="file" name="image" multiple accept="image/*" class="form-control mb-2">
+      <label>Upload 3D Files</label>
+      <input type="file" name="file" multiple class="form-control">
+    </div>
+    <button type="submit" class="btn btn-success">Upload Product</button>
+  </form>
+  <hr>
+  <h2>Your Products</h2>
+  <form method="post" id="bulk-action-form">
+    {% csrf_token %}
+    <div class="mb-2">
+      <input type="checkbox" id="select-all" onclick="toggleAll(this)"> <label for="select-all">Select All</label>
+      <select name="bulk_action" class="form-select d-inline w-auto ms-2" required>
+        <option value="">Bulk Action</option>
+        <option value="delete">Delete</option>
+        <option value="feature">Feature</option>
+        <option value="unfeature">Unfeature</option>
+      </select>
+      <button type="submit" class="btn btn-primary btn-sm ms-2">Apply</button>
+    </div>
+    <div class="row">
+      {% for product in products %}
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="form-check position-absolute m-2" style="z-index:2;">
+              <input class="form-check-input" type="checkbox" name="selected_products" value="{{ product.id }}" id="product-{{ product.id }}">
+            </div>
+            {% if product.media.all %}
+              <div id="carousel-{{ product.id }}" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  {% for media in product.media.all %}
+                    {% if media.image %}
+                      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ media.image.url }}" class="d-block w-100" alt="Product image">
+                      </div>
+                    {% elif media.file %}
+                      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <a href="{{ media.file.url }}" target="_blank">{{ media.file.name|basename }}</a>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ product.id }}" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ product.id }}" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              </div>
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title"><a href="/products/{{ product.id }}/">{{ product.name }}</a></h5>
+              <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+              <p><strong>Price:</strong> ${{ product.price }}</p>
+              <p><strong>Category:</strong> {{ product.category }}</p>
+              <p><strong>Type:</strong> {% if product.is_digital %}Digital{% endif %}{% if product.is_physical %} Physical{% endif %}</p>
+              {% if product.is_physical %}
+                <p><strong>Inventory:</strong> {{ product.inventory|default:'N/A' }}</p>
+              {% endif %}
+              <p><strong>Status:</strong> {% if product.draft %}<span class="badge bg-warning">Draft</span>{% else %}<span class="badge bg-success">Published</span>{% endif %}</p>
+              <p><strong>Views:</strong> {{ product.view_count }} | <strong>Purchases:</strong> {{ product.purchase_count }}</p>
+              <a href="{% url 'edit_product' product.id %}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+              <a href="{% url 'delete_product' product.id %}" class="btn btn-sm btn-outline-danger me-2">Delete</a>
+              <a href="{% url 'duplicate_product' product.id %}" class="btn btn-sm btn-outline-secondary">Duplicate</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p>No products uploaded yet.</p>
+      {% endfor %}
+    </div>
+  </form>
+  <script>
+    function toggleAll(source) {
+      checkboxes = document.getElementsByName('selected_products');
+      for(var i=0, n=checkboxes.length;i<n;i++) {
+        checkboxes[i].checked = source.checked;
+      }
+    }
+  </script>
+</div>
+{% endblock %}

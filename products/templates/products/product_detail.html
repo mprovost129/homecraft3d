@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.meta_title|default:product.name }} | {{ STORE_NAME }}{% endblock %}
+{% block meta %}
+  {% if product.meta_title %}<meta name="title" content="{{ product.meta_title }}">{% endif %}
+  {% if product.meta_description %}<meta name="description" content="{{ product.meta_description }}">{% endif %}
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-6">
+      {% if product.media.all %}
+        <div id="carousel-product-{{ product.id }}" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for media in product.media.all %}
+              {% if media.image %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <img src="{{ media.image.url }}" class="d-block w-100" alt="Product image">
+                </div>
+              {% elif media.file %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <a href="{{ media.file.url }}" target="_blank">{{ media.file.name|basename }}</a>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carousel-product-{{ product.id }}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carousel-product-{{ product.id }}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      <h2>{{ product.name }}</h2>
+      <p>{{ product.description }}</p>
+      <p><strong>Price:</strong> ${{ product.price }}</p>
+      <p><strong>Category:</strong> {{ product.category }}</p>
+      <p><strong>Type:</strong> {% if product.is_digital %}Digital{% endif %}{% if product.is_physical %} Physical{% endif %}</p>
+      {% if product.is_physical %}
+        <p><strong>Stock:</strong> {% if product.inventory == 0 %}<span class="text-danger">Out of stock</span>{% else %}{{ product.inventory|default:'N/A' }}{% endif %}</p>
+      {% endif %}
+      <p><strong>Measurements (mm):</strong> {{ product.length_mm }} x {{ product.width_mm }} x {{ product.height_mm }}</p>
+      <p><strong>Seller:</strong> {{ product.seller.user.username }}</p>
+      {% if user.is_authenticated and user != product.seller.user %}
+        <a href="/messaging/start/{{ product.seller.user.id }}/" class="btn btn-outline-primary mb-2">Message Seller</a>
+      {% endif %}
+      <h5>Downloads</h5>
+      <ul>
+        {% for media in product.media.all %}
+          {% if media.file %}
+            <li><a href="{{ media.file.url }}" download>{{ media.file.name|basename }}</a></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

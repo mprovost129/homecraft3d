@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Notifications | 3D Print Marketplace{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Notifications</h1>
+  <hr>
+  <div class="list-group">
+    {% for notif in notifications %}
+      <a href="{{ notif.url|default:'#' }}" class="list-group-item list-group-item-action {% if not notif.is_read %}list-group-item-info{% endif %}">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ notif.message }}</h5>
+          <small>{{ notif.created_at|date:"Y-m-d H:i" }}</small>
+        </div>
+        {% if not notif.is_read %}
+          <span class="badge bg-primary">New</span>
+        {% endif %}
+      </a>
+    {% empty %}
+      <div class="alert alert-info">No notifications.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

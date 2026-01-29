@@ -1,0 +1,10 @@
+django>=4.2
+djangorestframework
+celery
+stripe
+django-environ
+django-cors-headers
+django-storages
+boto3
+psycopg2
+Pillow

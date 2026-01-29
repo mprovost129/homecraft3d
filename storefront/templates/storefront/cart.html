@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Your Cart | {{ STORE_NAME }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Your Cart</h1>
+  <form method="post" action="{% url 'update_cart' %}">
+    {% csrf_token %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart_items %}
+        <tr>
+          <td><a href="/products/{{ item.product.id }}/">{{ item.product.name }}</a></td>
+          <td><input type="number" name="quantity_{{ item.product.id }}" value="{{ item.quantity }}" min="1" class="form-control" style="width:80px;"></td>
+          <td>${{ item.product.price }}</td>
+          <td>${{ item.subtotal }}</td>
+          <td><a href="{% url 'remove_from_cart' item.product.id %}" class="btn btn-sm btn-danger">Remove</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Your cart is empty.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="mb-3">
+      <strong>Total: ${{ total }}</strong>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Cart</button>
+    {% if cart_items %}
+      <button id="checkout-button" type="button" class="btn btn-success ms-2">Proceed to Checkout</button>
+    {% endif %}
+  </form>
+</div>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var checkoutBtn = document.getElementById('checkout-button');
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener('click', function() {
+        fetch('/payments/checkout/', {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+          },
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.url) {
+            window.location.href = data.url;
+          } else {
+            alert('Error: ' + (data.error || 'Could not start checkout.'));
+          }
+        });
+      });
+    }
+  });
+</script>
+{% endblock %}

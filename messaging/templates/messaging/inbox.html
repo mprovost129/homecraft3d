@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Inbox | 3D Print Marketplace{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Inbox</h1>
+  <hr>
+  <ul class="list-group">
+    {% for thread in threads %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{% url 'messaging:thread_detail' thread.id %}">
+          {% for user in thread.participants.all %}
+            {% if user != request.user %}{{ user.username }}{% endif %}
+          {% endfor %}
+        </a>
+        {% with unread=thread_unread_counts.thread.id %}
+          <span class="badge bg-primary">{{ unread|default:0 }} new</span>
+        {% endwith %}
+      </li>
+    {% empty %}
+      <li class="list-group-item">No messages yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

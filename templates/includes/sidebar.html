@@ -1,0 +1,56 @@
+{# Dedicated sidebar with category separation and admin links #}
+<div class="sidebar p-3 bg-light h-100">
+  <h6 class="text-uppercase">Categories</h6>
+  <h6 class="mt-3">Material Categories</h6>
+  <ul class="nav flex-column mb-3">
+    {% for category in material_categories %}
+      {% if not category.parent %}
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center {% if category.id|stringformat:'s' == category_id %}active fw-bold text-primary{% endif %}" data-bs-toggle="collapse" href="#mat-cat-{{ category.id }}" role="button" aria-expanded="false" aria-controls="mat-cat-{{ category.id }}">
+            <span class="me-1">+</span> {{ category.name }}
+          </a>
+          {% if category.subcategories.all %}
+            <ul class="collapse ms-3 nav flex-column" id="mat-cat-{{ category.id }}">
+              {% for sub in category.subcategories.all %}
+                <li class="nav-item">
+                  <a class="nav-link {% if sub.id|stringformat:'s' == subcategory_id %}active fw-bold text-primary{% endif %}" href="?subcategory={{ sub.id }}">{{ sub.name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endif %}
+    {% empty %}
+      <li class="nav-item text-muted">No material categories</li>
+    {% endfor %}
+  </ul>
+  <h6>Digital Download Categories</h6>
+  <ul class="nav flex-column mb-3">
+    {% for category in digital_categories %}
+      {% if not category.parent %}
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center {% if category.id|stringformat:'s' == category_id %}active fw-bold text-primary{% endif %}" data-bs-toggle="collapse" href="#dig-cat-{{ category.id }}" role="button" aria-expanded="false" aria-controls="dig-cat-{{ category.id }}">
+            <span class="me-1">+</span> {{ category.name }}
+          </a>
+          {% if category.subcategories.all %}
+            <ul class="collapse ms-3 nav flex-column" id="dig-cat-{{ category.id }}">
+              {% for sub in category.subcategories.all %}
+                <li class="nav-item">
+                  <a class="nav-link {% if sub.id|stringformat:'s' == subcategory_id %}active fw-bold text-primary{% endif %}" href="?subcategory={{ sub.id }}">{{ sub.name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endif %}
+    {% empty %}
+      <li class="nav-item text-muted">No digital categories</li>
+    {% endfor %}
+  </ul>
+  <h6 class="text-uppercase mt-4">Admin</h6>
+  <ul class="nav flex-column">
+    <li class="nav-item"><a href="{% url 'owner_dashboard' %}" class="nav-link">Dashboard Home</a></li>
+    <li class="nav-item"><a href="{% url 'category_list' %}" class="nav-link">Manage Categories</a></li>
+    <li class="nav-item"><a href="/admin/" class="nav-link">Django Admin</a></li>
+  </ul>
+</div>

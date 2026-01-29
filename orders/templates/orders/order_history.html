@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Order History | 3D Print Marketplace{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Order History</h1>
+  <hr>
+  {% if orders %}
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Items</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td>{{ order.id }}</td>
+          <td>{{ order.created_at|date:'Y-m-d H:i' }}</td>
+          <td>{{ order.status }}</td>
+          <td>
+            <ul>
+              {% for item in order.lineitem_set.all %}
+                <li>{{ item.product.name }} (x{{ item.quantity }})</li>
+              {% endfor %}
+            </ul>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>You have no orders yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

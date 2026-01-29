@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Edit Product | {{ STORE_NAME }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Edit Product</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <h5>Measurements (mm)</h5>
+    <div class="row mb-2">
+      <div class="col">{{ form.length_mm.label_tag }} {{ form.length_mm }}</div>
+      <div class="col">{{ form.width_mm.label_tag }} {{ form.width_mm }}</div>
+      <div class="col">{{ form.height_mm.label_tag }} {{ form.height_mm }}</div>
+    </div>
+    <h5>Media Gallery</h5>
+    <div class="mb-2">
+      <label>Upload Images</label>
+      <input type="file" name="image" multiple accept="image/*" class="form-control mb-2">
+      <label>Upload 3D Files</label>
+      <input type="file" name="file" multiple class="form-control">
+    </div>
+    <button type="submit" class="btn btn-success">Save Changes</button>
+    <a href="{% url 'manage_products' %}" class="btn btn-secondary ms-2">Cancel</a>
+  </form>
+  <hr>
+  <h3>Current Media</h3>
+  <div class="row">
+    {% for media in product.media.all %}
+      <div class="col-md-3 mb-2">
+        <form method="post" action="{% url 'remove_media' product.id media.id %}" style="display:inline;">
+          {% csrf_token %}
+          {% if media.image %}
+            <img src="{{ media.image.url }}" class="img-thumbnail" alt="Product image">
+          {% endif %}
+          {% if media.file %}
+            <a href="{{ media.file.url }}" download>{{ media.file.name|basename }}</a>
+          {% endif %}
+          <button type="submit" class="btn btn-sm btn-danger mt-1">Remove</button>
+        </form>
+      </div>
+    {% empty %}
+      <p>No media uploaded yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

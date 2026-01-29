@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}Home | 3D Print Marketplace{% endblock %}
+
+{% block sidebar %}
+    <h6 class="mt-3">Material Categories</h6>
+    <ul class="nav flex-column mb-3">
+        {% for category in material_categories %}
+            {% if not category.parent %}
+                <li class="nav-item">
+                                        <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#mat-cat-{{ category.id }}" role="button" aria-expanded="false" aria-controls="mat-cat-{{ category.id }}">
+                                                <span class="me-1">+</span>
+                                                {% if category.image %}
+                                                    <img src="{{ category.image.url }}" alt="{{ category.name }}" style="height:24px;width:24px;object-fit:cover;margin-right:4px;vertical-align:middle;">
+                                                {% endif %}
+                                                {{ category.name }}
+                                        </a>
+                    {% if category.subcategories.all %}
+                        <ul class="collapse ms-3 nav flex-column" id="mat-cat-{{ category.id }}">
+                            {% for sub in category.subcategories.all %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="?subcategory={{ sub.id }}">{{ sub.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endif %}
+        {% empty %}
+            <li class="nav-item text-muted">No material categories</li>
+        {% endfor %}
+    </ul>
+    <h6>Digital Download Categories</h6>
+    <ul class="nav flex-column">
+        {% for category in digital_categories %}
+            {% if not category.parent %}
+                <li class="nav-item">
+                                        <a class="nav-link d-flex align-items-center" data-bs-toggle="collapse" href="#dig-cat-{{ category.id }}" role="button" aria-expanded="false" aria-controls="dig-cat-{{ category.id }}">
+                                                <span class="me-1">+</span>
+                                                {% if category.image %}
+                                                    <img src="{{ category.image.url }}" alt="{{ category.name }}" style="height:24px;width:24px;object-fit:cover;margin-right:4px;vertical-align:middle;">
+                                                {% endif %}
+                                                {{ category.name }}
+                                        </a>
+                    {% if category.subcategories.all %}
+                        <ul class="collapse ms-3 nav flex-column" id="dig-cat-{{ category.id }}">
+                            {% for sub in category.subcategories.all %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="?subcategory={{ sub.id }}">{{ sub.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endif %}
+        {% empty %}
+            <li class="nav-item text-muted">No digital categories</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+                <div>
+                        <h1 class="mb-1">Welcome to the 3D Print Marketplace</h1>
+                        <p class="mb-0">Browse top-selling and new 3D print files from our sellers.</p>
+                        {% if breadcrumb and breadcrumb|length > 0 %}
+                        <nav aria-label="breadcrumb" class="mt-2">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">All Categories</a></li>
+                                {% for crumb in breadcrumb %}
+                                    {% if forloop.last %}
+                                        <li class="breadcrumb-item active" aria-current="page">{{ crumb.name }}</li>
+                                    {% else %}
+                                        <li class="breadcrumb-item"><a href="?category={{ crumb.id }}">{{ crumb.name }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ol>
+                        </nav>
+                        {% endif %}
+                </div>
+                <!-- Filter and sort bar -->
+        <form method="get" class="d-flex align-items-center flex-wrap mt-3 mt-md-0">
+            <label for="sort" class="me-2 mb-2">Sort by:</label>
+            <select name="sort" id="sort" class="form-select w-auto me-3 mb-2" onchange="this.form.submit()">
+                <option value="featured" {% if request.GET.sort == 'featured' %}selected{% endif %}>Featured</option>
+                <option value="high_price" {% if request.GET.sort == 'high_price' %}selected{% endif %}>Price: High to Low</option>
+                <option value="low_price" {% if request.GET.sort == 'low_price' %}selected{% endif %}>Price: Low to High</option>
+                <option value="most_viewed" {% if request.GET.sort == 'most_viewed' %}selected{% endif %}>Most Viewed</option>
+                <option value="most_purchased" {% if request.GET.sort == 'most_purchased' %}selected{% endif %}>Most Purchased</option>
+            </select>
+            <label for="category" class="me-2 mb-2">Category:</label>
+            <select name="category" id="category" class="form-select w-auto me-3 mb-2" onchange="this.form.submit()">
+                <option value="">All</option>
+                {% for category in categories %}
+                    {% if not category.parent %}
+                        <option value="{{ category.id }}" {% if category.id|stringformat:'s' == category_id %}selected{% endif %}>{{ category.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <label for="subcategory" class="me-2 mb-2">Subcategory:</label>
+            <select name="subcategory" id="subcategory" class="form-select w-auto me-3 mb-2" onchange="this.form.submit()">
+                <option value="">All</option>
+                {% for category in categories %}
+                    {% if category.parent %}
+                        <option value="{{ category.id }}" {% if category.id|stringformat:'s' == subcategory_id %}selected{% endif %}>{{ category.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <!-- Featured Material Products -->
+    <h2 class="mt-4">Featured Material Objects</h2>
+    <div class="row">
+        {% for product in featured_material|slice:':8' %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                                        {% if product.media.all %}
+                                            <div id="carousel-storefront-{{ product.id }}" class="carousel slide" data-bs-ride="carousel">
+                                                <div class="carousel-inner">
+                                                    {% for media in product.media.all %}
+                                                        {% if media.image %}
+                                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                                <img src="{{ media.image.url }}" class="d-block w-100" alt="Product image">
+                                                            </div>
+                                                        {% elif media.file %}
+                                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                                <a href="{{ media.file.url }}" target="_blank">{{ media.file.name|basename }}</a>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-storefront-{{ product.id }}" data-bs-slide="prev">
+                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                    <span class="visually-hidden">Previous</span>
+                                                </button>
+                                                <button class="carousel-control-next" type="button" data-bs-target="#carousel-storefront-{{ product.id }}" data-bs-slide="next">
+                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                    <span class="visually-hidden">Next</span>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description|truncatewords:15 }}</p>
+                                                <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+                                                {% if product.is_physical %}
+                                                    <p class="card-text">
+                                                        <strong>Stock:</strong>
+                                                        {% if product.inventory == 0 %}
+                                                            <span class="text-danger">Out of stock</span>
+                                                        {% else %}
+                                                            {{ product.inventory|default:'N/A' }}
+                                                        {% endif %}
+                                                    </p>
+                                                {% endif %}
+                        <p class="card-text small text-muted">Seller: {{ product.seller.user.username }}</p>
+                        <span class="badge bg-warning text-dark">Featured Material</span>
+                        <a href="{% url 'product_detail' product.id %}" class="btn btn-primary mt-auto">View Details</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No featured material objects yet.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Featured Digital Products -->
+    <h2 class="mt-4">Featured Digital Objects</h2>
+    <div class="row">
+        {% for product in featured_digital|slice:':8' %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    {% if product.media.first.image %}
+                        <img src="{{ product.media.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description|truncatewords:15 }}</p>
+                        <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+                        <p class="card-text small text-muted">Seller: {{ product.seller.user.username }}</p>
+                        <span class="badge bg-info text-dark">Featured Digital</span>
+                        <a href="{% url 'product_detail' product.id %}" class="btn btn-primary mt-auto">View Details</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No featured digital objects yet.</p>
+        {% endfor %}
+    </div>
+
+    <!-- All Products (as before) -->
+        <h2 class="mt-4">All Products</h2>
+        <div class="row">
+                {% for product in products %}
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                                <div class="card h-100 shadow-sm border-0">
+                                        {% if product.media.first.image %}
+                                                <img src="{{ product.media.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                                        {% endif %}
+                                        <div class="card-body d-flex flex-column">
+                                                <h5 class="card-title">{{ product.name }}</h5>
+                                                <p class="card-text">{{ product.description|truncatewords:15 }}</p>
+                                                                                                <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+                                                                                                {% if product.is_physical %}
+                                                                                                    <p class="card-text">
+                                                                                                        <strong>Stock:</strong>
+                                                                                                        {% if product.inventory == 0 %}
+                                                                                                            <span class="text-danger">Out of stock</span>
+                                                                                                        {% else %}
+                                                                                                            {{ product.inventory|default:'N/A' }}
+                                                                                                        {% endif %}
+                                                                                                    </p>
+                                                                                                {% endif %}
+                                                <p class="card-text small text-muted">Seller: {{ product.seller.user.username }}</p>
+                                                {% if product.featured_manual %}
+                                                        <span class="badge bg-warning text-dark">Featured</span>
+                                                {% endif %}
+                                                <a href="{% url 'product_detail' product.id %}" class="btn btn-primary mt-auto">View Details</a>
+                                        </div>
+                                </div>
+                        </div>
+                {% empty %}
+                        <p>No products available yet.</p>
+                {% endfor %}
+        </div>
+        {% if products.has_other_pages %}
+        <nav aria-label="Product pagination">
+            <ul class="pagination justify-content-center mt-3">
+                {% if products.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?{% if category_id %}category={{ category_id }}&{% endif %}{% if subcategory_id %}subcategory={{ subcategory_id }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ products.previous_page_number }}">Previous</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                {% endif %}
+                {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?{% if category_id %}category={{ category_id }}&{% endif %}{% if subcategory_id %}subcategory={{ subcategory_id }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if products.has_next %}
+                    <li class="page-item"><a class="page-link" href="?{% if category_id %}category={{ category_id }}&{% endif %}{% if subcategory_id %}subcategory={{ subcategory_id }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ products.next_page_number }}">Next</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+{% endblock %}

@@ -1,0 +1,45 @@
+/* Modern storefront enhancements */
+
+.navbar-brand span.fw-bold {
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+}
+
+.navbar .navbar-nav.flex-row .nav-link {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+    font-weight: 500;
+}
+
+.navbar .btn {
+    margin-left: 0.5rem;
+}
+
+aside[role="complementary"], aside.col-md-2 {
+    min-height: 100vh;
+    background: #f8f9fa;
+    border-right: 1px solid #e5e5e5;
+}
+
+aside h6 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+.card {
+    border-radius: 0.75rem;
+    transition: box-shadow 0.2s;
+}
+.card:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+.card-img-top {
+    object-fit: cover;
+    height: 180px;
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+.btn-primary.mt-auto {
+    margin-top: auto;
+}

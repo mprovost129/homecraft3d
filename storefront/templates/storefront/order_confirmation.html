@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Order Confirmation | 3D Print Marketplace{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Order Confirmation</h1>
+  <hr>
+  <p>Thank you for your purchase! Your order has been placed.</p>
+  <h4>Order Details</h4>
+  <ul>
+    <li>Order ID: {{ order.id }}</li>
+    <li>Status: {{ order.status }}</li>
+    <li>Date: {{ order.created_at|date:'Y-m-d H:i' }}</li>
+  </ul>
+  <a href="/" class="btn btn-primary">Return to Storefront</a>
+</div>
+{% endblock %}

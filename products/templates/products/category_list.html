@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Manage Categories{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Manage Categories</h2>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+  <form method="post" action="{% url 'category_add' %}" class="mb-3">
+    {% csrf_token %}
+    <div class="input-group">
+      {{ form.name }}
+      {{ form.parent }}
+      <button class="btn btn-success" type="submit">Add Category</button>
+    </div>
+  </form>
+  <ul class="list-group">
+    {% for category in categories %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center" style="flex:1;">
+          <form method="post" action="{% url 'category_edit' category.id %}" class="d-flex align-items-center me-2" style="flex:1;">
+            {% csrf_token %}
+            <input type="text" name="name" value="{{ category.name }}" class="form-control form-control-sm me-2" style="max-width:200px;">
+            <select name="parent" class="form-select form-select-sm me-2" style="max-width:200px;">
+              <option value="">No Parent</option>
+              {% for parent in categories %}
+                {% if parent.id != category.id %}
+                  <option value="{{ parent.id }}" {% if category.parent and category.parent.id == parent.id %}selected{% endif %}>{{ parent.name }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+            <button class="btn btn-primary btn-sm me-2" type="submit">Edit</button>
+          </form>
+          <a href="{% url 'category_reorder' category.id 'up' %}" class="btn btn-outline-secondary btn-sm me-1">&#8593;</a>
+          <a href="{% url 'category_reorder' category.id 'down' %}" class="btn btn-outline-secondary btn-sm me-2">&#8595;</a>
+        </div>
+        <form method="post" action="{% url 'category_delete' category.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button class="btn btn-danger btn-sm">Delete</button>
+        </form>
+      </li>
+      {% for sub in category.subcategories.all %}
+        <li class="list-group-item ms-4">↳ {{ sub.name }}</li>
+      {% endfor %}
+    {% empty %}
+      <li class="list-group-item">No categories yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

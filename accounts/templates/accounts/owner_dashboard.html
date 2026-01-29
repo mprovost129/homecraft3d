@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}Owner Dashboard | 3D Print Marketplace{% endblock %}
+
+{% block navbar %}
+  {% include 'includes/navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<script>
+  // Pass dynamic chart data from Django to JS
+  const salesLabels = {{ sales_labels|safe }};
+  const salesData = {{ sales_data|safe }};
+  const userLabels = {{ user_labels|safe }};
+  const userData = {{ user_data|safe }};
+</script>
+<div class="container-fluid mt-4">
+  <h1>Owner Dashboard</h1>
+  <hr>
+  <p>Welcome, {{ user.username }}! You have full site privileges.</p>
+  <div class="mb-3">
+    <a href="{% url 'wishlist' %}" class="btn btn-outline-primary">View Wishlist</a>
+  </div>
+  <div class="row mb-4">
+    <div class="col-md-6 mb-4">
+      <h4>Sales Overview</h4>
+      <canvas id="salesChart" width="400" height="200" style="max-width:100%;"></canvas>
+    </div>
+    <div class="col-md-6 mb-4">
+      <h4>User Growth</h4>
+      <canvas id="userChart" width="400" height="200" style="max-width:100%;"></canvas>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title">Users</h6>
+          <p class="display-6">{{ summary.user_count }}</p>
+          <a href="/admin/accounts/user/" class="btn btn-sm btn-outline-primary">Manage</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title">Sellers</h6>
+          <p class="display-6">{{ summary.seller_count }}</p>
+          <a href="/admin/accounts/sellerprofile/" class="btn btn-sm btn-outline-success">Manage</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title">Consumers</h6>
+          <p class="display-6">{{ summary.consumer_count }}</p>
+          <a href="/admin/accounts/consumerprofile/" class="btn btn-sm btn-outline-secondary">Manage</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title">Products</h6>
+          <p class="display-6">{{ summary.product_count }}</p>
+          <a href="/admin/products/product/" class="btn btn-sm btn-outline-warning">Manage</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title">Orders</h6>
+          <p class="display-6">{{ summary.order_count }}</p>
+          <a href="/admin/orders/order/" class="btn btn-sm btn-outline-info">Manage</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title">Reviews</h6>
+          <p class="display-6">{{ summary.review_count }}</p>
+          <a href="/admin/reviews/rating/" class="btn btn-sm btn-outline-dark">Manage</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title">Feedback</h6>
+          <p class="display-6">{{ summary.feedback_count }}</p>
+          <a href="/admin/reviews/feedback/" class="btn btn-sm btn-outline-dark">Manage</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title">Storefront Settings</h6>
+          <p class="display-6">{{ summary.storefront_settings_count }}</p>
+          <a href="/admin/storefront/storefrontsettings/" class="btn btn-sm btn-outline-primary">Manage</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <h4>Recent Users</h4>
+      <table class="table table-sm table-hover">
+        <thead><tr><th>Username</th><th>Email</th><th>Date Joined</th></tr></thead>
+        <tbody>
+          {% for u in latest_users %}
+            <tr><td>{{ u.username }}</td><td>{{ u.email }}</td><td>{{ u.date_joined|date:'Y-m-d' }}</td></tr>
+          {% empty %}<tr><td colspan="3">No users</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <h4>Recent Products</h4>
+      <table class="table table-sm table-hover">
+        <thead><tr><th>Name</th><th>Seller</th><th>Price</th></tr></thead>
+        <tbody>
+          {% for p in latest_products %}
+            <tr><td>{{ p.name }}</td><td>{{ p.seller.user.username }}</td><td>${{ p.price }}</td></tr>
+          {% empty %}<tr><td colspan="3">No products</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <h4>Recent Orders</h4>
+      <table class="table table-sm table-hover">
+        <thead><tr><th>ID</th><th>Consumer</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for o in latest_orders %}
+            <tr><td>{{ o.id }}</td><td>{{ o.consumer.username }}</td><td>{{ o.status }}</td><td>{{ o.created_at|date:'Y-m-d' }}</td></tr>
+          {% empty %}<tr><td colspan="4">No orders</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <h4>Recent Reviews</h4>
+      <table class="table table-sm table-hover">
+        <thead><tr><th>Product</th><th>User</th><th>Score</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for r in latest_reviews %}
+            <tr><td>{{ r.product.name }}</td><td>{{ r.user.username }}</td><td>{{ r.score }}</td><td>{{ r.created_at|date:'Y-m-d' }}</td></tr>
+          {% empty %}<tr><td colspan="4">No reviews</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="mb-4">
+    <h4>Quick Actions</h4>
+    <a href="/admin/accounts/user/add/" class="btn btn-primary btn-sm me-2">Add User</a>
+    <a href="/admin/products/product/add/" class="btn btn-success btn-sm me-2">Add Product</a>
+    <a href="/admin/orders/order/add/" class="btn btn-info btn-sm me-2">Add Order</a>
+    <a href="/admin/reviews/rating/add/" class="btn btn-dark btn-sm">Add Review</a>
+  </div>
+  <ul>
+    <li><a href="/admin/" class="btn btn-outline-primary">Django Admin</a></li>
+    <li><a href="{% url 'profile' %}?as_owner=1" class="btn btn-outline-secondary mt-2">View Consumer Dashboard</a></li>
+    <li><a href="{% url 'dashboard' %}?as_owner=1" class="btn btn-outline-success mt-2">View Seller Dashboard</a></li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block footer %}
+  {% include 'includes/footer.html' %}
+{% endblock %}
