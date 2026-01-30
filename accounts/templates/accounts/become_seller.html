@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load form_extras %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>Become a Seller</h2>
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <!-- No business name needed for individuals -->
+    <div class="form-check mb-3">
+      {{ form.agree_terms|add_class:'form-check-input' }}
+      <label class="form-check-label" for="id_agree_terms">I agree to the <a href="/legal/terms/" target="_blank">seller terms</a> and understand I am signing up as an individual creator.</label>
+      {% if form.agree_terms.errors %}
+        <div class="text-danger small">{{ form.agree_terms.errors }}</div>
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Become a Seller</button>
+  </form>
+</div>
+{% endblock %}

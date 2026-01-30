@@ -1,4 +1,5 @@
 from django.db import models
+from .models_wishlist import Wishlist
 
 class ProductVariant(models.Model):
     product = models.ForeignKey('Product', related_name='variants', on_delete=models.CASCADE)

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}My Collections{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>My Collections</h2>
+  <a href="{% url 'collection_create' %}" class="btn btn-primary mb-3">Create New Collection</a>
+  <div class="row">
+    {% for collection in collections %}
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ collection.name }}</h5>
+            <p class="card-text">{{ collection.description }}</p>
+            <a href="{% url 'collection_detail' collection.id %}" class="btn btn-outline-primary btn-sm">View</a>
+            {% if collection.is_public %}
+              <a href="{{ collection.get_share_url }}" class="btn btn-outline-success btn-sm">Share</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">No collections yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

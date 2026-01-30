@@ -1,6 +1,7 @@
 # Checkout and order confirmation views
 from products.models import Product, Category
 from ..models import StorefrontSettings
+from ..forms import AdvancedSearchForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from products.models import Product
@@ -50,34 +51,52 @@ def home(request):
     if settings_obj:
         mode = settings_obj.featured_products_mode
 
+    # Advanced search form
+    form = AdvancedSearchForm(request.GET or None)
+    products_qs = Product.objects.all()
     sort = request.GET.get('sort', 'featured')
     category_id = request.GET.get('category')
     subcategory_id = request.GET.get('subcategory')
-    products_qs = Product.objects.all()
+    if form.is_valid():
+        data = form.cleaned_data
+        if data.get('q'):
+            products_qs = products_qs.filter(name__icontains=data['q'])
+        if data.get('category'):
+            products_qs = products_qs.filter(category__name__icontains=data['category'])
+        if data.get('min_price') is not None:
+            products_qs = products_qs.filter(price__gte=data['min_price'])
+        if data.get('max_price') is not None:
+            products_qs = products_qs.filter(price__lte=data['max_price'])
+        # Add more filters as needed for type, etc.
+        if data.get('sort'):
+            sort = data['sort']
+
     if subcategory_id:
         products_qs = products_qs.filter(category_id=subcategory_id)
     elif category_id:
-        # Show products in this category or any of its subcategories
         subcat_ids = list(Category.objects.filter(parent_id=category_id).values_list('id', flat=True))
         products_qs = products_qs.filter(category_id__in=[category_id] + subcat_ids)
 
-    # Separate featured products
     featured_material = products_qs.filter(featured_manual=True, is_physical=True)
     featured_digital = products_qs.filter(featured_manual=True, is_digital=True)
-
-
-    # Only show published products in the storefront
     products = products_qs.filter(draft=False)
+
+    # Trending, recommended, and new models
+    trending_products = Product.objects.filter(draft=False).order_by('-view_count')[:8]
+    new_products = Product.objects.filter(draft=False).order_by('-id')[:8]
+    recommended_products = Product.objects.filter(draft=False).order_by('-purchase_count')[:8]
 
     from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
     if sort == 'high_price':
         products = products.order_by('-price')
     elif sort == 'low_price':
         products = products.order_by('price')
-    elif sort == 'most_viewed':
+    elif sort == 'most_viewed' or sort == 'popular':
         products = products.order_by('-view_count')
     elif sort == 'most_purchased':
         products = products.order_by('-purchase_count')
+    elif sort == 'newest':
+        products = products.order_by('-id')
     else:  # featured/manual
         if mode == 'most_viewed':
             products = products.order_by('-view_count')
@@ -86,7 +105,7 @@ def home(request):
         else:
             products = products.filter(featured_manual=True)
 
-    paginator = Paginator(products, 12)  # 12 products per page
+    paginator = Paginator(products, 12)
     page = request.GET.get('page')
     try:
         products = paginator.page(page)
@@ -121,8 +140,12 @@ def home(request):
         'featured_digital': featured_digital,
         'material_categories': material_categories,
         'digital_categories': digital_categories,
-        'category_id': category_id,
-        'subcategory_id': subcategory_id,
         'breadcrumb': breadcrumb,
         'unread_notifications_count': unread_notifications_count,
+        'form': form,
+        'category_id': category_id,
+        'subcategory_id': subcategory_id,
+        'trending_products': trending_products,
+        'new_products': new_products,
+        'recommended_products': recommended_products,
     })

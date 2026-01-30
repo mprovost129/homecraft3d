@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load form_extras %}
 {% block title %}Profile | 3D Print Marketplace{% endblock %}
 {% block content %}
 <div class="container mt-4">
@@ -10,24 +11,73 @@
           {% if success %}
             <div class="alert alert-success">Profile updated successfully.</div>
           {% endif %}
-          <form method="post" novalidate>
+          <!-- Profile Stats & Badges -->
+          <div class="mb-4">
+            <h5>User Stats</h5>
+            <span class="badge bg-primary me-2">Products: {{ user.products.count }}</span>
+            <span class="badge bg-success me-2">Orders: {{ user.orders.count }}</span>
+            <span class="badge bg-info text-dark me-2">Reviews: {{ user.rating_set.count }}</span>
+          </div>
+          <div class="mb-4">
+            <h5>Badges</h5>
+            {% if user.is_owner %}<span class="badge bg-dark me-2">Owner</span>{% endif %}
+            {% if user.is_seller %}<span class="badge bg-warning text-dark me-2">Seller</span>{% endif %}
+            {% if user.is_consumer %}<span class="badge bg-secondary me-2">Consumer</span>{% endif %}
+          </div>
+          <form method="post" novalidate class="needs-validation">
             {% csrf_token %}
             <div class="row">
               <div class="col-md-6">
-                <div class="mb-3">{{ form.first_name.label_tag }}{{ form.first_name }}</div>
-                <div class="mb-3">{{ form.last_name.label_tag }}{{ form.last_name }}</div>
-                <div class="mb-3">{{ form.email.label_tag }}{{ form.email }}</div>
-                <div class="mb-3">{{ form.phone_number.label_tag }}{{ form.phone_number }}</div>
-                <div class="mb-3">{{ form.address1.label_tag }}{{ form.address1 }}</div>
-                <div class="mb-3">{{ form.address2.label_tag }}{{ form.address2 }}</div>
-                <div class="mb-3">{{ form.city.label_tag }}{{ form.city }}</div>
-                <div class="mb-3">{{ form.state.label_tag }}{{ form.state }}</div>
-                <div class="mb-3">{{ form.zip_code.label_tag }}{{ form.zip_code }}</div>
-                <div class="mb-3">
-                  {{ form.theme_preference.label_tag }}
-                  {{ form.theme_preference }}
-                  <small class="form-text text-muted">Choose your preferred site theme. If not set, the site default will be used.</small>
-                </div>
+                <fieldset class="border rounded-3 p-3 mb-4">
+                  <legend class="float-none w-auto px-2 fs-6">Personal Information</legend>
+                  <div class="mb-3">
+                    {{ form.first_name.label_tag }}
+                    {{ form.first_name|add_class:'form-control' }}
+                  </div>
+                  <div class="mb-3">
+                    {{ form.last_name.label_tag }}
+                    {{ form.last_name|add_class:'form-control' }}
+                  </div>
+                  <div class="mb-3">
+                    {{ form.email.label_tag }}
+                    {{ form.email|add_class:'form-control' }}
+                  </div>
+                  <div class="mb-3">
+                    {{ form.phone_number.label_tag }}
+                    {{ form.phone_number|add_class:'form-control' }}
+                  </div>
+                </fieldset>
+                <fieldset class="border rounded-3 p-3 mb-4">
+                  <legend class="float-none w-auto px-2 fs-6">Address</legend>
+                  <div class="mb-3">
+                    {{ form.address1.label_tag }}
+                    {{ form.address1|add_class:'form-control' }}
+                  </div>
+                  <div class="mb-3">
+                    {{ form.address2.label_tag }}
+                    {{ form.address2|add_class:'form-control' }}
+                  </div>
+                  <div class="mb-3">
+                    {{ form.city.label_tag }}
+                    {{ form.city|add_class:'form-control' }}
+                  </div>
+                  <div class="mb-3">
+                    {{ form.state.label_tag }}
+                    {{ form.state|add_class:'form-control' }}
+                  </div>
+                  <div class="mb-3">
+                    {{ form.zip_code.label_tag }}
+                    {{ form.zip_code|add_class:'form-control' }}
+                  </div>
+                </fieldset>
+                <fieldset class="border rounded-3 p-3 mb-4">
+                  <legend class="float-none w-auto px-2 fs-6">Preferences</legend>
+                  <div class="mb-3">
+                    {{ form.theme_preference.label_tag }}
+                    {{ form.theme_preference|add_class:'form-select' }}
+                    <small class="form-text text-muted">Choose your preferred site theme. If not set, the site default will be used.</small>
+                  </div>
+                </fieldset>
                 <div class="form-check mb-3">
                   <input class="form-check-input" type="checkbox" id="agree_privacy" name="agree_privacy" required>
                   <label class="form-check-label" for="agree_privacy">

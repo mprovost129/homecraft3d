@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Collection: {{ collection.name }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>{{ collection.name }}</h2>
+  <p>{{ collection.description }}</p>
+  <div class="mb-3">
+    {% if collection.is_public %}
+      <span class="badge bg-success">Public/Shareable</span>
+      <a href="{{ collection.get_share_url }}" class="btn btn-outline-success btn-sm">Share Link</a>
+    {% else %}
+      <span class="badge bg-secondary">Private</span>
+    {% endif %}
+  </div>
+  <h4>Products in this Collection</h4>
+  <div class="row">
+    {% for product in collection.products.all %}
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+            <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary btn-sm">View Product</a>
+            <form method="post" action="{% url 'collection_remove_product' collection.id product.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">No products in this collection yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

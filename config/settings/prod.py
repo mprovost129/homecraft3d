@@ -12,3 +12,6 @@ DATABASES = {
             ssl_require=IS_RENDER,  # SSL on Render; allow non-SSL locally if you ever set DATABASE_URL locally
         )
     }
+
+# Ensure reCAPTCHA default action matches form usage
+RECAPTCHA_DEFAULT_ACTION = 'register'

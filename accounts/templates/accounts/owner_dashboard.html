@@ -159,8 +159,8 @@
   </div>
   <ul>
     <li><a href="/admin/" class="btn btn-outline-primary">Django Admin</a></li>
-    <li><a href="{% url 'profile' %}?as_owner=1" class="btn btn-outline-secondary mt-2">View Consumer Dashboard</a></li>
-    <li><a href="{% url 'dashboard' %}?as_owner=1" class="btn btn-outline-success mt-2">View Seller Dashboard</a></li>
+    <li><a href="{% url 'accounts:profile' %}?as_owner=1" class="btn btn-outline-secondary mt-2">View Consumer Dashboard</a></li>
+    <li><a href="{% url 'sellers:dashboard' %}?as_owner=1" class="btn btn-outline-success mt-2">View Seller Dashboard</a></li>
   </ul>
 </div>
 {% endblock %}

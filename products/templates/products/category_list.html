@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 {% block title %}Manage Categories{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
   <h2>Manage Categories</h2>
+
   {% if messages %}
     {% for message in messages %}
       <div class="alert alert-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
   {% endif %}
+
   <form method="post" action="{% url 'category_add' %}" class="mb-3">
     {% csrf_token %}
     <div class="input-group">
@@ -16,34 +19,66 @@
       <button class="btn btn-success" type="submit">Add Category</button>
     </div>
   </form>
+
   <ul class="list-group">
     {% for category in categories %}
       <li class="list-group-item d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center" style="flex:1;">
-          <form method="post" action="{% url 'category_edit' category.id %}" class="d-flex align-items-center me-2" style="flex:1;">
+          <form method="post" action="{% url 'category_edit' category.id %}"
+                class="d-flex align-items-center me-2" style="flex:1;">
             {% csrf_token %}
-            <input type="text" name="name" value="{{ category.name }}" class="form-control form-control-sm me-2" style="max-width:200px;">
-            <select name="parent" class="form-select form-select-sm me-2" style="max-width:200px;">
+
+            <input type="text" name="name" value="{{ category.name }}"
+                   class="form-control form-control-sm me-2" style="max-width:220px;">
+
+            <select name="parent" class="form-select form-select-sm me-2" style="max-width:220px;">
               <option value="">No Parent</option>
-              {% for parent in categories %}
+              {% for parent in parent_choices %}
                 {% if parent.id != category.id %}
-                  <option value="{{ parent.id }}" {% if category.parent and category.parent.id == parent.id %}selected{% endif %}>{{ parent.name }}</option>
+                  <option value="{{ parent.id }}"
+                          {% if category.parent and category.parent.id == parent.id %}selected{% endif %}>
+                    {{ parent.name }}
+                  </option>
                 {% endif %}
               {% endfor %}
             </select>
-            <button class="btn btn-primary btn-sm me-2" type="submit">Edit</button>
+
+            <button class="btn btn-primary btn-sm me-2" type="submit">Save</button>
           </form>
-          <a href="{% url 'category_reorder' category.id 'up' %}" class="btn btn-outline-secondary btn-sm me-1">&#8593;</a>
-          <a href="{% url 'category_reorder' category.id 'down' %}" class="btn btn-outline-secondary btn-sm me-2">&#8595;</a>
+
+          <form method="post" action="{% url 'category_reorder' category.id 'up' %}" class="d-inline me-1">
+            {% csrf_token %}
+            <button class="btn btn-outline-secondary btn-sm" type="submit" title="Move up">&#8593;</button>
+          </form>
+
+          <form method="post" action="{% url 'category_reorder' category.id 'down' %}" class="d-inline me-2">
+            {% csrf_token %}
+            <button class="btn btn-outline-secondary btn-sm" type="submit" title="Move down">&#8595;</button>
+          </form>
         </div>
-        <form method="post" action="{% url 'category_delete' category.id %}" style="display:inline;">
+
+        <form method="post" action="{% url 'category_delete' category.id %}" class="d-inline">
           {% csrf_token %}
-          <button class="btn btn-danger btn-sm">Delete</button>
+          <button class="btn btn-danger btn-sm"
+                  onclick="return confirm('Delete this category? This may affect products assigned to it.');">
+            Delete
+          </button>
         </form>
       </li>
+
       {% for sub in category.subcategories.all %}
-        <li class="list-group-item ms-4">↳ {{ sub.name }}</li>
+        <li class="list-group-item ms-4 d-flex justify-content-between align-items-center">
+          <span>↳ {{ sub.name }}</span>
+          <form method="post" action="{% url 'category_delete' sub.id %}" class="d-inline">
+            {% csrf_token %}
+            <button class="btn btn-outline-danger btn-sm"
+                    onclick="return confirm('Delete this subcategory?');">
+              Delete
+            </button>
+          </form>
+        </li>
       {% endfor %}
+
     {% empty %}
       <li class="list-group-item">No categories yet.</li>
     {% endfor %}

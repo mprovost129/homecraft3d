@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_totp",
     "two_factor",
     # Project apps
-    "accounts",
+    "accounts.apps.AccountsConfig",
     "storefront",
     "products",
     "orders",
@@ -224,7 +224,6 @@ STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY")
 # ------------------------------------------------------------
 RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY")
 RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY")
-RECAPTCHA_DEFAULT_ACTION = "generic"
 RECAPTCHA_SCORE_THRESHOLD = 0.5
 
 # ------------------------------------------------------------

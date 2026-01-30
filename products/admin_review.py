@@ -8,12 +8,12 @@ class ProductReviewAdmin(admin.ModelAdmin):
     search_fields = ("product__name", "user__username", "title", "body")
     actions = ["approve_reviews", "hide_reviews"]
 
+    @admin.action(description="Approve selected reviews")
     def approve_reviews(self, request, queryset):
         updated = queryset.update(is_approved=True, is_hidden=False)
         self.message_user(request, f"{updated} review(s) approved.")
-    approve_reviews.short_description = "Approve selected reviews"
 
+    @admin.action(description="Hide selected reviews")
     def hide_reviews(self, request, queryset):
         updated = queryset.update(is_hidden=True)
         self.message_user(request, f"{updated} review(s) hidden.")
-    hide_reviews.short_description = "Hide selected reviews"

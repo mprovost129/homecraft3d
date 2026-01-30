@@ -1,5 +1,8 @@
 from django.contrib import admin
+
 from .models import StorefrontSettings
+from .admin_featured import *
+from .admin_collections import *
 
 class StorefrontSettingsAdmin(admin.ModelAdmin):
     def has_module_permission(self, request):

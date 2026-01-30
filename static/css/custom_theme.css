@@ -1,0 +1,71 @@
+/* Custom theme for 3D Print Marketplace */
+/* Sidebar styling to match navbar and add white separator */
+.app-sidebar {
+  background-color: #1A2636 !important;
+  color: #fff !important;
+  border-right: 1.5px solid #fff !important;
+  border-top: 0px solid #fff !important;
+  box-shadow: none !important;
+}
+
+body {
+  background-color: #F5F7FA;
+  color: #222F3E;
+}
+
+.navbar {
+  background-color: #1A2636 !important;
+  box-shadow: 0 2px 8px rgba(34,58,94,0.08);
+}
+
+.navbar .navbar-brand, .navbar .nav-link, .navbar .navbar-text {
+  color: #fff !important;
+}
+
+.navbar .nav-link.active, .navbar .nav-link:focus, .navbar .nav-link:hover {
+  color: #2979FF !important;
+}
+
+.btn-primary, .dashboard-btn {
+  background-color: #2979FF;
+  border-color: #2979FF;
+  color: #fff;
+}
+
+.btn-primary:hover, .dashboard-btn:hover {
+  background-color: #2563EB;
+  border-color: #2563EB;
+}
+
+.btn-outline-primary {
+  color: #2979FF;
+  border-color: #2979FF;
+  background: #fff;
+}
+
+.btn-outline-primary:hover {
+  background: #2979FF;
+  color: #fff;
+}
+
+.card, .main-content, .storefront-main {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(34,58,94,0.04);
+}
+
+.dashboard-btn {
+  font-weight: 600;
+  margin-left: 1rem;
+  box-shadow: 0 2px 8px rgba(41,121,255,0.08);
+}
+
+/* Make sure main content area is white */
+.main-content, .storefront-main {
+  padding: 2rem;
+}
+
+/* Optional: subtle border for cards */
+.card {
+  border: 1px solid #E3E8EE;
+}

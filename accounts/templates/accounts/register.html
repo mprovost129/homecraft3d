@@ -2,28 +2,63 @@
 {% block title %}Register | 3D Print Marketplace{% endblock %}
 {% block content %}
 <div class="container mt-5">
-  <h2>Register</h2>
-  <form method="post">
-    {% csrf_token %}
-    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-    {{ form.username.label_tag }} {{ form.username }}<br>
-    {{ form.email.label_tag }} {{ form.email }}<br>
-    {{ form.password.label_tag }} {{ form.password }}<br>
-    {{ form.captcha }}
-    <div class="form-check mt-3">
-      <input class="form-check-input" type="checkbox" id="agree_terms" name="agree_terms" required>
-      <label class="form-check-label" for="agree_terms">
-        I agree to the <a href="/legal/terms/" target="_blank">Terms & Conditions</a>
-      </label>
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+      <div class="card shadow-lg border-0">
+        <div class="card-body p-4">
+          <h2 class="card-title mb-4 text-center"><i class="bi bi-person-plus-fill me-2"></i>Register</h2>
+          <form method="post" class="d-flex flex-column gap-3">
+            {% csrf_token %}
+            {% if error_message %}
+              <div class="alert alert-danger">{{ error_message }}</div>
+            {% endif %}
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.errors %}
+              <div class="text-danger small">{{ form.username.errors }}</div>
+            {% endif %}
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {% if form.email.errors %}
+              <div class="text-danger small">{{ form.email.errors }}</div>
+            {% endif %}
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            {% if form.password.errors %}
+              <div class="text-danger small">{{ form.password.errors }}</div>
+            {% endif %}
+            {% if form.captcha %}
+              <div class="mb-3" id="recaptcha-container">
+                {{ form.captcha }}
+              </div>
+            {% endif %}
+            <div class="form-check mb-2">
+              {{ form.agree_terms }}
+              <label class="form-check-label" for="id_agree_terms">
+                I agree to the <a href="/legal/terms/" target="_blank">Terms & Conditions</a>
+              </label>
+              {% if form.agree_terms.errors %}
+                <div class="text-danger small">{{ form.agree_terms.errors }}</div>
+              {% endif %}
+            </div>
+            <div class="form-check mb-3">
+              {{ form.agree_privacy }}
+              <label class="form-check-label" for="id_agree_privacy">
+                I have read the <a href="/legal/privacy/" target="_blank">Privacy Policy</a>
+              </label>
+              {% if form.agree_privacy.errors %}
+                <div class="text-danger small">{{ form.agree_privacy.errors }}</div>
+              {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2"><i class="bi bi-person-plus"></i> Register</button>
+          </form>
+          <p class="mt-3 text-center">Already have an account? <a href="{% url 'accounts:login' %}">Login here</a>.</p>
+        </div>
+      </div>
     </div>
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" id="agree_privacy" name="agree_privacy" required>
-      <label class="form-check-label" for="agree_privacy">
-        I have read the <a href="/legal/privacy/" target="_blank">Privacy Policy</a>
-      </label>
-    </div>
-    <button type="submit" class="btn btn-primary">Register</button>
-  </form>
-  <p class="mt-3">Already have an account? <a href="{% url 'accounts:login' %}">Login here</a>.</p>
+  </div>
 </div>
 {% endblock %}

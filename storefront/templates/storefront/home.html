@@ -1,5 +1,132 @@
-
 {% extends 'base.html' %}
+{% load storefront_extras %}
+{% load static %}
+<section class="container mb-5">
+    <h2 class="mb-4 text-center">Featured Creators</h2>
+    <div class="row justify-content-center g-4">
+        {% for fc in featured_creators %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm border-0 text-center">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            {% if fc.seller.user.profile.avatar %}
+                                <img src="{{ fc.seller.user.profile.avatar.url }}" class="rounded-circle mb-2" style="width:64px;height:64px;object-fit:cover;">
+                            {% else %}
+                                <span class="avatar-placeholder rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center mb-2" style="width:64px;height:64px;font-size:2rem;">{{ fc.seller.user.username|first|upper }}</span>
+                            {% endif %}
+                        </div>
+                        <h5 class="card-title mb-1">{{ fc.seller.user.username }}</h5>
+                        {% if fc.note %}<p class="text-muted small mb-2">{{ fc.note }}</p>{% endif %}
+                        <a href="/sellers/{{ fc.seller.id }}/" class="btn btn-outline-primary btn-sm">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Featured Collections Section -->
+<section class="container mb-5">
+    <h2 class="mb-4 text-center">Featured Collections</h2>
+    <div class="row justify-content-center g-4">
+        {% for coll in featured_collections %}
+            <div class="col-12 col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ coll.name }}</h4>
+                        {% if coll.description %}<p class="card-text">{{ coll.description }}</p>{% endif %}
+                        <div class="row g-2">
+                            {% for product in coll.products.all|default:coll.products %}
+                                <div class="col-6 col-lg-4">
+                                    <div class="card h-100 border-0">
+                                        {% if product.media.first.image %}
+                                            <a href="{% url 'product_detail' product.id %}"><img src="{{ product.media.first.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height:80px;object-fit:cover;"></a>
+                                        {% endif %}
+                                        <div class="card-body p-2">
+                                            <a href="{% url 'product_detail' product.id %}" class="fw-bold small">{{ product.name }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Trending Products -->
+<h2 class="mt-4">Trending Models</h2>
+<div class="row">
+    {% for product in trending_products %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="card h-100 shadow border-0 product-card">
+                {% if product.media.first.image %}
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.media.first.image.url }}" class="card-img-top product-img" alt="{{ product.name }}">
+                    </a>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <a href="{% url 'product_detail' product.id %}" class="fw-bold">{{ product.name }}</a>
+                    <p class="card-text small text-muted">Views: {{ product.view_count }}</p>
+                    <p class="card-text">{{ product.description|truncatewords:12 }}</p>
+                    <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary mt-auto">View Details</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>No trending models yet.</p>
+    {% endfor %}
+</div>
+
+<!-- Recommended Products -->
+<h2 class="mt-4">Recommended For You</h2>
+<div class="row">
+    {% for product in recommended_products %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="card h-100 shadow border-0 product-card">
+                {% if product.media.first.image %}
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.media.first.image.url }}" class="card-img-top product-img" alt="{{ product.name }}">
+                    </a>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <a href="{% url 'product_detail' product.id %}" class="fw-bold">{{ product.name }}</a>
+                    <p class="card-text small text-muted">Purchases: {{ product.purchase_count }}</p>
+                    <p class="card-text">{{ product.description|truncatewords:12 }}</p>
+                    <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary mt-auto">View Details</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>No recommended models yet.</p>
+    {% endfor %}
+</div>
+
+<!-- New Products -->
+<h2 class="mt-4">New Arrivals</h2>
+<div class="row">
+    {% for product in new_products %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="card h-100 shadow border-0 product-card">
+                {% if product.media.first.image %}
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.media.first.image.url }}" class="card-img-top product-img" alt="{{ product.name }}">
+                    </a>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <a href="{% url 'product_detail' product.id %}" class="fw-bold">{{ product.name }}</a>
+                    <p class="card-text small text-muted">Added recently</p>
+                    <p class="card-text">{{ product.description|truncatewords:12 }}</p>
+                    <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary mt-auto">View Details</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>No new models yet.</p>
+    {% endfor %}
+</div>
 {% load storefront_extras %}
 {% load static %}
 
@@ -64,20 +191,88 @@
 
 
 {% block content %}
-<!-- Hero Banner -->
 <section class="py-5 mb-4 bg-light rounded shadow-sm">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-7">
                 <h1 class="display-4 fw-bold mb-2">Discover &amp; Print Amazing 3D Designs</h1>
                 <p class="lead mb-4">Shop, download, and print the best 3D models and physical objects from top creators.</p>
+                <form method="get" class="row g-2 align-items-end mb-3">
+                    <div class="col-12 col-md-6">
+                        {{ form.q }}
+                    </div>
+                    <div class="col-6 col-md-2">
+                        {{ form.type }}
+                    </div>
+                    <div class="col-6 col-md-2">
+                        {{ form.category }}
+                    </div>
+                    <div class="col-6 col-md-1">
+                        {{ form.min_price }}
+                    </div>
+                    <div class="col-6 col-md-1">
+                        {{ form.max_price }}
+                    </div>
+                    <div class="col-12 col-md-2">
+                        {{ form.sort }}
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </form>
                 <a href="#all-products" class="btn btn-primary btn-lg me-2">Browse Products</a>
-                <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg">Become a Seller</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-outline-primary btn-lg">Become a Seller</a>
             </div>
             <div class="col-md-5 text-center">
                 <img src="/static/images/homecraft3d_icon_512.png" alt="3D Print Marketplace" class="img-fluid rounded shadow-sm" style="max-height:220px;">
             </div>
         </div>
+    </div>
+</section>
+
+<!-- Quick Links Section -->
+<section class="container mb-4">
+    <div class="row justify-content-center g-3">
+        <div class="col-auto">
+            <a href="/products/" class="btn btn-outline-primary btn-lg">Browse All Products</a>
+        </div>
+        <div class="col-auto">
+            <a href="/products/upload/" class="btn btn-outline-success btn-lg">Upload a Model</a>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'accounts:register' %}" class="btn btn-outline-warning btn-lg">Become a Seller</a>
+        </div>
+        <div class="col-auto">
+            <a href="/orders/history/" class="btn btn-outline-info btn-lg">My Orders</a>
+        </div>
+        <div class="col-auto">
+            <a href="/support/" class="btn btn-outline-dark btn-lg">Support</a>
+        </div>
+    </div>
+</section>
+
+<!-- Category Highlights Section -->
+<section class="container mb-5">
+    <h2 class="mb-4 text-center">Category Highlights</h2>
+    <div class="row justify-content-center g-4">
+        {% for category in categories|slice:':6' %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="?category={{ category.id }}" class="text-decoration-none text-dark">
+                    <div class="card h-100 shadow-sm border-0 text-center category-highlight">
+                        {% if category.image %}
+                            <img src="{{ category.image.url }}" class="card-img-top mx-auto d-block" alt="{{ category.name }}" style="height:80px;width:auto;object-fit:contain;">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center" style="height:80px;">
+                                <span class="fw-bold text-secondary">No Image</span>
+                            </div>
+                        {% endif %}
+                        <div class="card-body p-2">
+                            <h6 class="card-title mb-0">{{ category.name }}</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
     </div>
 </section>
 

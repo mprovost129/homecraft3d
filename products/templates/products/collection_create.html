@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Create Collection{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Create New Collection</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+    </div>
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="is_public" name="is_public" checked>
+      <label class="form-check-label" for="is_public">Make collection public/shareable</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Create Collection</button>
+  </form>
+</div>
+{% endblock %}

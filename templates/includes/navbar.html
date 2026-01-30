@@ -1,106 +1,151 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-4">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom mb-1">
   <div class="container-fluid">
-    <!-- Logo and Brand -->
-    <a class="navbar-brand d-flex align-items-center me-4" href="/">
-      <img src="{% static 'images/homecraft3d_navbar.svg' %}" alt="Home Craft 3D Logo" style="height:40px;width:auto;object-fit:contain;">
+
+    <a class="navbar-brand d-flex align-items-center me-4" href="{% url 'storefront:storefront_home' %}">
+      <img src="{% static 'images/homecraft3d_navbar_tight.svg' %}"
+           alt="Home Craft 3D Logo"
+           style="height:70px;width:auto;max-width:260px;object-fit:contain;display:block;margin-right:10px;">
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+
     <div class="collapse navbar-collapse" id="navbarNav">
-      <!-- Centered Menu -->
+
       <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="/">Storefront</a></li>
-        <li class="nav-item"><a class="nav-link" href="/products/">All Products</a></li>
-        {% if user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="/products/wishlist/">Wishlist</a></li>
-          {% if user.is_consumer %}
-            <li class="nav-item"><a class="nav-link" href="/orders/history/">Order History</a></li>
-          {% endif %}
-        {% endif %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'storefront:storefront_home' %}">Storefront</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'products:product_list' %}">All Products</a></li>
       </ul>
-      <!-- Right Side: Cart Icon and Profile Dropdown -->
-      <ul class="navbar-nav mb-2 mb-lg-0 ms-auto align-items-center">
+
+      <form class="d-flex me-2" method="get" action="{% url 'products:product_list' %}" role="search">
+        <input class="form-control me-2" type="search" name="q" value="{{ request.GET.q|default:'' }}"
+               placeholder="Search models, creators..." aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
+      </form>
+
+      <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+
         {% if user.is_authenticated %}
-        <li class="nav-item dropdown">
-          <a class="nav-link position-relative" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
-            <span class="position-relative">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
-                <path d="M8 16a2 2 0 0 0 1.985-1.75H6.015A2 2 0 0 0 8 16zm.104-14.804A1 1 0 0 0 7 2c0 .628-.134 1.197-.356 1.684C5.885 4.36 5 5.522 5 7v2.086l-.707.707A1 1 0 0 0 4 10v1h8v-1a1 1 0 0 0-.293-.707L11 9.086V7c0-1.478-.885-2.64-1.644-3.316A3.007 3.007 0 0 0 9 2a1 1 0 0 0-.896-.804zM8 1a2 2 0 0 1 2 2c0 .628.134 1.197.356 1.684C10.115 4.36 11 5.522 11 7v2.586l.707.707A2 2 0 0 1 13 10v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-1a2 2 0 0 1 1.293-1.707L5 9.586V7c0-1.478.885-2.64 1.644-3.316A3.007 3.007 0 0 1 8 1z"/>
-              </svg>
-              {% if unread_notifications_count > 0 %}
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unread_notifications_count }}</span>
+          {# Dashboard button (single source of truth) #}
+          <li class="nav-item me-2">
+            {% if user.is_owner %}
+              <a class="btn btn-primary" href="{% url 'accounts:owner_dashboard' %}">
+                <i class="bi bi-speedometer2"></i> Owner Dashboard
+              </a>
+            {% elif user.is_seller %}
+              <a class="btn btn-primary" href="{% url 'sellers:dashboard' %}">
+                <i class="bi bi-speedometer2"></i> Seller Dashboard
+              </a>
+            {% else %}
+              <a class="btn btn-primary" href="{% url 'accounts:profile' %}">
+                <i class="bi bi-person-circle"></i> My Dashboard
+              </a>
+            {% endif %}
+          </li>
+
+          {# Notifications #}
+          <li class="nav-item dropdown">
+            <a class="nav-link position-relative" href="#" id="notifDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+              <i class="bi bi-bell" style="font-size:1.25rem;"></i>
+              {% if unread_notifications_count|default:0 > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {{ unread_notifications_count }}
+                </span>
               {% endif %}
-            </span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="min-width:320px;max-width:400px;">
-            <li class="dropdown-header">Notifications</li>
-            {% for notif in user.notifications.all|slice:":5" %}
-              <li>
-                <a class="dropdown-item d-flex justify-content-between align-items-center {% if not notif.is_read %}fw-bold{% endif %}" href="{% url 'accounts:notifications' %}">
-                  <span>{{ notif.message|truncatechars:40 }}</span>
-                  <small class="text-muted ms-2">{{ notif.created_at|date:"Y-m-d H:i" }}</small>
-                </a>
-              </li>
-            {% empty %}
-              <li><span class="dropdown-item text-muted">No notifications</span></li>
-            {% endfor %}
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-center" href="{% url 'accounts:notifications' %}">View all notifications</a></li>
-          </ul>
-        </li>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown"
+                style="min-width:320px;max-width:400px;">
+              <li class="dropdown-header">Notifications</li>
+
+              {% for notif in top_notifications %}
+                <li>
+                  <a class="dropdown-item d-flex justify-content-between align-items-center {% if not notif.is_read %}fw-bold{% endif %}"
+                     href="{% url 'accounts:notifications' %}">
+                    <span>{{ notif.message|truncatechars:40 }}</span>
+                    <small class="text-muted ms-2">{{ notif.created_at|date:"Y-m-d H:i" }}</small>
+                  </a>
+                </li>
+              {% empty %}
+                <li><span class="dropdown-item text-muted">No notifications</span></li>
+              {% endfor %}
+
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-center" href="{% url 'accounts:notifications' %}">View all notifications</a></li>
+            </ul>
+          </li>
         {% endif %}
+
+        {# Cart #}
         <li class="nav-item">
-          <a class="nav-link position-relative" href="/cart/" title="View Cart">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
-              <path d="M0 1.5A.5.5 0 0 1 .5 1h1a.5.5 0 0 1 .485.379L2.89 5H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 14H4a.5.5 0 0 1-.491-.408L1.01 2H.5a.5.5 0 0 1-.5-.5zm3.14 4l1.25 6h7.22l1.25-6H3.14zM5 12a2 2 0 1 0 4 0 2 2 0 0 0-4 0zm2 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm5 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0zm2 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-            </svg>
-            {% if cart_item_count > 0 %}
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.75em;">
+          <a class="nav-link position-relative" href="{% url 'storefront:cart' %}" title="View Cart">
+            <i class="bi bi-cart" style="font-size:1.25rem;"></i>
+            {% if cart_item_count|default:0 > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                    style="font-size:0.75em;">
                 {{ cart_item_count }}
                 <span class="visually-hidden">cart items</span>
               </span>
             {% endif %}
           </a>
         </li>
+
+        {# Messages #}
         <li class="nav-item">
-          <a class="nav-link" href="/messaging/inbox/">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chat-dots me-1" viewBox="0 0 16 16">
-              <path d="M2 2a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h10.586l2.707 2.707A1 1 0 0 0 16 13.586V4a2 2 0 0 0-2-2H2zm0-1h12a3 3 0 0 1 3 3v9a2 2 0 0 1-2 2H2a3 3 0 0 1-3-3V4a3 3 0 0 1 3-3z"/>
-              <circle cx="4" cy="8" r="1"/>
-              <circle cx="8" cy="8" r="1"/>
-              <circle cx="12" cy="8" r="1"/>
-            </svg>
-            Messages
+          <a class="nav-link" href="{% url 'messaging:inbox' %}">
+            <i class="bi bi-chat-dots me-1"></i> Messages
           </a>
         </li>
+
         {% if user.is_authenticated %}
+          {# Profile dropdown holds all role-specific links #}
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Profile">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown"
+               role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Profile">
               {% if user.profile_picture %}
-                <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;">
+                <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="rounded-circle"
+                     style="width:32px;height:32px;object-fit:cover;">
               {% else %}
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-                  <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4-3a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
-                  <path fill-rule="evenodd" d="M14 14s-1-1.5-6-1.5S2 14 2 14V13a6 6 0 1 1 12 0v1z"/>
-                </svg>
+                <i class="bi bi-person-circle" style="font-size:1.25rem;"></i>
               {% endif %}
             </a>
+
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-              <li><a class="dropdown-item" href="/accounts/profile/">Profile</a></li>
-              {% if user.is_consumer and not user.is_seller and not user.is_owner %}
-                <li><a class="dropdown-item" href="/accounts/become-seller/">Become a Seller</a></li>
+              <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profile</a></li>
+              <li><a class="dropdown-item" href="{% url 'accounts:settings' %}">Settings</a></li>
+
+              {% if user.is_owner %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'accounts:owner_dashboard' %}">Owner Dashboard</a></li>
+                <li><a class="dropdown-item" href="{% url 'storefront:settings' %}">Site Settings</a></li>
               {% endif %}
-              <li><a class="dropdown-item" href="/accounts/settings/">Settings</a></li>
+
+              {% if user.is_seller or user.is_owner %}
+                <li><a class="dropdown-item" href="{% url 'sellers:dashboard' %}">Seller Dashboard</a></li>
+                <li><a class="dropdown-item" href="{% url 'sellers:manage_products' %}">Manage Products</a></li>
+                <li><a class="dropdown-item" href="{% url 'sellers:product_analytics' %}">Analytics</a></li>
+              {% endif %}
+
+              {% if user.is_consumer and not user.is_seller and not user.is_owner %}
+                <li><a class="dropdown-item" href="{% url 'products:wishlist' %}">Wishlist</a></li>
+                <li><a class="dropdown-item" href="{% url 'orders:history' %}">Order History</a></li>
+                <li><a class="dropdown-item" href="{% url 'accounts:become_seller' %}">Become a Seller</a></li>
+              {% endif %}
+
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/accounts/logout/">Logout</a></li>
+              <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
             </ul>
           </li>
         {% else %}
-          <li class="nav-item"><a class="nav-link" href="/accounts/login/">Login</a></li>
-          <li class="nav-item"><a class="nav-link" href="/accounts/register/">Register</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:register' %}">Register</a></li>
         {% endif %}
+
       </ul>
     </div>
   </div>

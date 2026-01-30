@@ -27,7 +27,7 @@ def add_review(request, product_id):
             review.save()
             # Notify seller if review is for their product
             seller_user = getattr(product.seller, 'user', None)
-            review_url = request.build_absolute_uri(reverse('product_detail', args=[product.id]))
+            review_url = request.build_absolute_uri(reverse('product_detail', args=[product.pk]))
             notif_message = f"Your product '{product.name}' received a new review."
             if seller_user and seller_user != request.user:
                 # In-app notification
@@ -51,7 +51,7 @@ def add_review(request, product_id):
                     )
                     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [seller_user.email], fail_silently=True)
             messages.success(request, 'Your review has been submitted.')
-            return redirect('product_detail', product_id=product.id)
+            return redirect('product_detail', product_id=product.pk)
     else:
         form = ProductReviewForm(instance=review)
     return render(request, 'products/add_review.html', {'form': form, 'product': product, 'review': review})

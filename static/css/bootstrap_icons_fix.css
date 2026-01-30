@@ -1,0 +1,18 @@
+/* Fix for Bootstrap Icons not rendering correctly if custom CSS interferes */
+.bi {
+  font-family: "bootstrap-icons" !important;
+  font-style: normal;
+  font-weight: normal !important;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  letter-spacing: normal;
+  display: inline-block;
+  text-decoration: inherit;
+  text-align: center;
+  /* Prevent custom color/weight from overriding icon */
+  color: inherit;
+  vertical-align: -.125em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

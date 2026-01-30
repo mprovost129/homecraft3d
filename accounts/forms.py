@@ -32,13 +32,27 @@ class ConsumerProfileForm(forms.ModelForm):
         model = ConsumerProfile
         fields = ['preferences']
 
+
+from django.conf import settings
+
 class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-    captcha = ReCaptchaField(widget=ReCaptchaV3(action='register'))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    agree_terms = forms.BooleanField(required=True, label="I agree to the Terms & Conditions")
+    agree_privacy = forms.BooleanField(required=True, label="I have read the Privacy Policy")
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password']  # Only model fields here!
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not getattr(settings, 'DEBUG', False):
+            # Only add captcha in production
+            self.fields['captcha'] = ReCaptchaField(widget=ReCaptchaV3(action='register'))
 
 class UserSettingsForm(forms.ModelForm):
     class Meta:
@@ -54,4 +68,9 @@ class UserSettingsForm(forms.ModelForm):
 class UserLoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
-    captcha = ReCaptchaField(widget=ReCaptchaV3(action='login'))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not getattr(settings, 'DEBUG', False):
+            # Only add captcha in production
+            self.fields['captcha'] = ReCaptchaField(widget=ReCaptchaV3(action='login'))

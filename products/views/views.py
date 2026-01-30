@@ -4,9 +4,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from accounts.permissions import owner_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .models_wishlist import Wishlist
-from .models import Product, Category
-from .forms import CategoryForm
+from ..models_wishlist import Wishlist
+from ..models import Product, Category
+from ..forms import CategoryForm
 from accounts.models import User
 from accounts.models_notification import Notification
 from django.core.mail import send_mail
@@ -36,7 +36,7 @@ def remove_from_wishlist(request, product_id):
     return redirect('wishlist')
 
 from django.shortcuts import render, get_object_or_404
-from .models import Product
+from ..models import Product
 from django.contrib import messages
 
 def product_list(request):
@@ -98,7 +98,7 @@ def product_list(request):
         products = products.order_by('-id')
 
     # Filter by min_rating (aggregate)
-    from .models_review import ProductReview
+    from ..models_review import ProductReview
     from django.db.models import Avg
     if min_rating:
         try:
@@ -125,7 +125,7 @@ def product_list(request):
         wishlist_product_ids = set(wishlist.products.values_list('id', flat=True))
 
     # Average ratings for products on this page
-    from .models_review import ProductReview
+    from ..models_review import ProductReview
     from django.db.models import Avg
     avg_ratings = {}
     for prod in products_page:
@@ -266,7 +266,7 @@ def category_reorder(request, category_id, direction):
 # Product detail view
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    from .models_review import ProductReview
+    from ..models_review import ProductReview
     from django.db import models as djmodels
     reviews = ProductReview.objects.filter(product=product).select_related('user').all()
     avg_rating = reviews.aggregate(djmodels.Avg('rating'))['rating__avg']

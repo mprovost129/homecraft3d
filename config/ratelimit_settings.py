@@ -1,10 +1,17 @@
-from django_ratelimit.decorators import ratelimit
+
+import os
 from django.conf import settings
 
+# Determine if running in development (DEBUG True or env var)
+IS_DEV = getattr(settings, 'DEBUG', False) or os.environ.get('DJANGO_ENV') == 'development'
 
-# Example: Rate limit login attempts to 5 per minute per IP
-LOGIN_RATELIMIT = '5/m'
-# Rate limit registration attempts to 3 per minute per IP
-REGISTER_RATELIMIT = '3/m'
-# Rate limit password reset requests to 3 per minute per IP
-PASSWORD_RESET_RATELIMIT = '3/m'
+if IS_DEV:
+	# Effectively disable rate limiting in development
+	LOGIN_RATELIMIT = '1000/m'
+	REGISTER_RATELIMIT = '1000/m'
+	PASSWORD_RESET_RATELIMIT = '1000/m'
+else:
+	# Production limits
+	LOGIN_RATELIMIT = '5/m'
+	REGISTER_RATELIMIT = '3/m'
+	PASSWORD_RESET_RATELIMIT = '3/m'

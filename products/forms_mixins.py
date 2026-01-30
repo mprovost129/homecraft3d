@@ -1,7 +1,9 @@
 from django.core.exceptions import ValidationError
 from utils.virus_scan import scan_file_with_clamav
 
-class VirusScanMixin:
+from django import forms
+
+class VirusScanMixin(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
         file = cleaned_data.get('file')
